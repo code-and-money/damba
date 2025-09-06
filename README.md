@@ -24,7 +24,6 @@ $ pg-tools (--version)
 $ pg-tools --help [COMMAND]
 USAGE
   $ pg-tools COMMAND
-...
 ```
 <!-- usagestop -->
 # Commands
