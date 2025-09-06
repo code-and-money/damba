@@ -1,20 +1,60 @@
 {
 	"name": "@alexvyber/pg-tools",
+	"version": "0.0.0-dev.2",
+	"publishConfig": {
+		"access": "public"
+	},
 	"description": "A new CLI generated with oclif",
-	"version": "0.0.0-dev.0",
+	"keywords": [
+		"oclif"
+	],
+	"homepage": "https://github.com/alexvyber/pg-tools",
+	"bugs": "https://github.com/alexvyber/pg-tools/issues",
+	"repository": "alexvyber/pg-tools",
+	"license": "MIT",
 	"author": "Alexey Sokolov",
+	"type": "module",
+	"exports": {
+		".": "./dist/index.js"
+	},
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"bin": {
 		"pg-tools": "./bin/run.js"
 	},
-	"bugs": "https://github.com/@alexvyber/pg-tools/issues",
+	"files": [
+		"./bin",
+		"./dist",
+		"./oclif.manifest.json"
+	],
+	"scripts": {
+		"build": "shx rm -rf dist && tsc -b",
+		"lint": "eslint",
+		"prepack": "oclif manifest && oclif readme",
+		"postpack": "shx rm -f oclif.manifest.json",
+		"test": "mocha --forbid-only \"test/**/*.test.ts\"",
+		"posttest": "pnpm run lint",
+		"version": "oclif readme && git add README.md"
+	},
+	"oclif": {
+		"bin": "pg-tools",
+		"commands": "./dist/commands",
+		"dirname": "pg-tools",
+		"plugins": [
+			"@oclif/plugin-help",
+			"@oclif/plugin-plugins"
+		],
+		"topicSeparator": " ",
+		"topics": {
+			"hello": {
+				"description": "Say hello to the world and others"
+			}
+		}
+	},
 	"dependencies": {
 		"@oclif/core": "^4",
-		"@oclif/plugin-help": "^6",
-		"@oclif/plugin-plugins": "^5",
+
 		"pg": "^8.16.3"
-	},
-	"exports": {
-		".": "./dist/index.js"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1",
@@ -36,43 +76,5 @@
 	},
 	"engines": {
 		"node": ">=18.0.0"
-	},
-	"files": [
-		"./bin",
-		"./dist",
-		"./oclif.manifest.json"
-	],
-	"homepage": "https://github.com/@alexvyber/pg-tools",
-	"keywords": [
-		"oclif"
-	],
-	"license": "MIT",
-	"main": "dist/index.js",
-	"type": "module",
-	"oclif": {
-		"bin": "pg-tools",
-		"dirname": "pg-tools",
-		"commands": "./dist/commands",
-		"plugins": [
-			"@oclif/plugin-help",
-			"@oclif/plugin-plugins"
-		],
-		"topicSeparator": " ",
-		"topics": {
-			"hello": {
-				"description": "Say hello to the world and others"
-			}
-		}
-	},
-	"repository": "@alexvyber/pg-tools",
-	"scripts": {
-		"build": "shx rm -rf dist && tsc -b",
-		"lint": "eslint",
-		"postpack": "shx rm -f oclif.manifest.json",
-		"posttest": "pnpm run lint",
-		"prepack": "oclif manifest && oclif readme",
-		"test": "mocha --forbid-only \"test/**/*.test.ts\"",
-		"version": "oclif readme && git add README.md"
-	},
-	"types": "dist/index.d.ts"
+	}
 }
