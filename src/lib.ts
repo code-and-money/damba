@@ -1,5 +1,5 @@
 import { Client } from "pg"
-import type { CraeteConfig, DatabaseCredentials, DropConfig } from "./types.js"
+import type { CreateConfig, DatabaseCredentials, DropConfig } from "./types.js"
 
 const pgErrors: Record<string, { name: string; code: string; message: string }> = {
   "42P04": { name: "PDG_ERR::DuplicateDatabase", code: "42P04", message: "Database already exist." },
@@ -45,23 +45,38 @@ const defaultCredentials: DatabaseCredentials = {
 }
 
 /**
- * @param config Requires a `database` you are trying to create. `existsError` is default to false. When `existsError` is `true`,
- * it will throw error when database already exist before executing creation.
- * @param credentials Default to localhost:5432 `postgres` database and `postgres` user with empty password.
- * @throws `PgDbGodError` More details at `pgErrors`.
+ * Creates a new PostgreSQL database using the given configuration and credentials.
  *
- * @example create({ database: 'bank-development' })
+ * - Connects to the PostgreSQL server.
+ * - Checks if the database already exists.
+ * - Depending on {@link CreateConfig.existsError}, either throws an error, returns silently, or creates the database.
+ * - Always closes the client connection at the end.
+ *
+ * @param params - The parameters object.
+ * @param params.config - The configuration for database creation. {@link CreateConfig }
+ * @param params.credentials - Optional connection credentials that override {@link defaultCredentials}.
+ *
+ * @throws {PgToolsError} If the database already exists and `config.existsError` is `true`.
+ * @throws {Error} If the query result is invalid, or another unknown error occurs.
+ *
+ * @example
+ * ```ts
+ * await create({
+ *   config: { database: "mydb", existsError: true },
+ *   credentials: { user: "postgres", password: "secret" }
+ * });
+ * ```
  */
-export async function create({ config, credentials }: { config: CraeteConfig; credentials?: Partial<DatabaseCredentials> }) {
+export async function create({ config, credentials }: { config: CreateConfig; credentials?: Partial<DatabaseCredentials> }) {
   const client = new Client({ ...defaultCredentials, ...credentials })
 
   try {
     await client.connect()
 
     const db = await client.query(`
-      SELECT datname
-      FROM pg_catalog.pg_database
-      WHERE lower(datname) = lower('${config.database}');
+      select datname
+      from pg_catalog.pg_database
+      where lower(datname) = lower('${config.database}');
     `)
 
     if (!db?.rowCount) {
@@ -76,7 +91,7 @@ export async function create({ config, credentials }: { config: CraeteConfig; cr
       return
     }
 
-    await client.query(`CREATE DATABASE "${config.database}";`)
+    await client.query(`create database "${config.database}";`)
   } catch (error) {
     if (error instanceof PgToolsError) {
       throw PgToolsError.fromPgToolsError(error)
@@ -93,13 +108,39 @@ export async function create({ config, credentials }: { config: CraeteConfig; cr
 }
 
 /**
- * @param config.database Requires a `database` you are trying to drop.
- * @param config.notExistsError is default to false. When `notExistsError` is `true`, it will throw error when database doesn't exist before executing drop.
- * @param config.dropConnections is default to true. When `dropConnections` is `true`, it will automatically drop all current connections to the database.
- * @param credentials Default to localhost:5432 `postgres` database and `postgres` user with empty password.
- * @throws `PgDbGodError` More details at `pgErrors`.
+ * Drops a PostgreSQL database according to the provided configuration.
  *
- * @example drop({ database: 'bank-development' })
+ * - Connects to the PostgreSQL server using the given credentials (or defaults).
+ * - Checks whether the target database exists.
+ *   - If it does not exist:
+ *     - Throws a {@link PgToolsError.dbDoesNotExist} if `config.notExistsError` is `true`.
+ *     - Returns silently if `config.notExistsError` is `false` or unset.
+ * - If the database exists and `config.dropConnections` is not `false`,
+ *   calls {@link dropConnections} to forcibly disconnect all clients.
+ * - Executes a `DROP DATABASE` statement to remove the database.
+ * - Always closes the client connection in the `finally` block.
+ *
+ * @note ⚠️ Notes:
+ * - You cannot drop the database you are currently connected to.
+ *   Connect to another database (e.g. `postgres`) first.
+ * - If `dropConnections` is `false` and the database has active connections,
+ *   the drop will fail.
+ *
+ * @param params - The parameters object.
+ * @param params.config - The drop configuration (see {@link DropConfig}).
+ * @param params.credentials - Optional connection credentials that override {@link defaultCredentials}.
+ *
+ * @throws {PgToolsError} If the database does not exist (and `notExistsError` is `true`).
+ * @throws {PgToolsError} If wrapped from another `PgToolsError`.
+ * @throws {Error} For query errors, invalid results, or unexpected issues.
+ *
+ * @example
+ * ```ts
+ * await drop({
+ *   config: { database: "mydb", notExistsError: true, dropConnections: true },
+ *   credentials: { user: "postgres", password: "secret" }
+ * });
+ * ```
  */
 export async function drop({ config, credentials }: { config: DropConfig; credentials?: Partial<DatabaseCredentials> }) {
   const client = new Client({ ...defaultCredentials, ...credentials })
@@ -108,9 +149,9 @@ export async function drop({ config, credentials }: { config: DropConfig; creden
     await client.connect()
 
     const db = await client.query(`
-      SELECT datname
-      FROM pg_catalog.pg_database
-      WHERE lower(datname) = lower('${config.database}');
+      select datname
+      from pg_catalog.pg_database
+      where lower(datname) = lower('${config.database}');
     `)
 
     if (db.rowCount === 0 && config.notExistsError) {
@@ -124,7 +165,7 @@ export async function drop({ config, credentials }: { config: DropConfig; creden
       await dropConnections(client, config.database)
     }
 
-    await client.query(`DROP DATABASE "${config.database}";`)
+    await client.query(`drop database "${config.database}";`)
   } catch (error) {
     if (error instanceof PgToolsError) {
       throw PgToolsError.fromPgToolsError(error)
@@ -140,56 +181,45 @@ export async function drop({ config, credentials }: { config: DropConfig; creden
   }
 }
 
+/**
+ * Drops all active connections to the specified PostgreSQL database.
+ *
+ * - Revokes new connections from `PUBLIC` on the given database.
+ * - Terminates all currently active sessions connected to that database,
+ *   except for the current session.
+ *
+ * @note ⚠️ You must call this from another database (e.g., `postgres`), because you
+ * cannot terminate your own active connection to the target database.
+ *
+ * @param client - An active PostgreSQL {@link Client} connected to the server.
+ * @param {string} dbName - The name of the database whose connections should be dropped.
+ *
+ * @returns A promise resolving to the result of the `client.query` execution.
+ *
+ * @example
+ * ```ts
+ * const client = new Client({ user: "postgres", password: "secret" });
+ * await client.connect();
+ *
+ * await dropConnections(client, "mydb");
+ *
+ * await client.end();
+ * ```
+ */
 async function dropConnections(client: Client, dbName: string) {
   return client.query(`
-		REVOKE CONNECT ON DATABASE '${dbName}' FROM PUBLIC;
+		revoke connect on database '${dbName}' from public;
 
-    SELECT
+    select
       pg_terminate_backend(pg_stat_activity.pid)
-    FROM
+    from
       pg_stat_activity
-    WHERE
+    where
       pg_stat_activity.datname = '${dbName}'
-      AND pid <> pg_backend_pid();
+      and pid <> pg_backend_pid();
   `)
 }
 
-/**
- * Shallow merge objects without overriding fields with `undefined`.
- * TODO: return better types
- */
-// export function merge(target: object, ...sources: object[]) {
-// 	return Object.assign(
-// 		{},
-// 		target,
-// 		...sources.map((x) =>
-// 			Object.entries(x)
-// 				.filter(([_, value]) => value !== undefined)
-// 				.reduce(
-// 					(obj, [key, value]) => ((obj[key] = value), obj),
-// 					{} as Record<string, undefined>,
-// 				),
-// 		),
-// 	);
-// }
-
-// export function merge(target: object, ...sources: object[]) {
-//   const cleanedSources: Record<string, unknown>[] = [];
-
-//   for (const source of sources) {
-//     const cleaned: Record<string, unknown> = {};
-
-//     for (const [key, value] of Object.entries(source)) {
-//       if (value !== undefined) {
-//         cleaned[key] = value;
-//       }
-//     }
-
-//     cleanedSources.push(cleaned);
-//   }
-
-//   return Object.assign({}, target, ...cleanedSources);
-// }
 export function merge<T extends object, U extends object>(target: T, source: U): T & U {
   const result = Object.assign({}, target)
 
@@ -215,12 +245,12 @@ export function merge<T extends object, U extends object>(target: T, source: U):
 export function parsePostgresUrl(url: string) {
   const urlQuery = URL.parse(url)
   if (!urlQuery) {
-    throw new Error("Url cant be pased")
+    throw new Error("Url can not be parsed")
   }
 
   const params = urlQuery.pathname.split("/")
   if (params.length > 2) {
-    throw new Error("Invalid DB url string was provided")
+    throw new Error("Invalid database url string was provided")
   }
 
   return {
