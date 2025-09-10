@@ -198,19 +198,60 @@ async function dropDbOtherUserConnections(client: Client, dbName: string) {
  * Shallow merge objects without overriding fields with `undefined`.
  * TODO: return better types
  */
-export function merge(target: object, ...sources: object[]) {
-	return Object.assign(
-		{},
-		target,
-		...sources.map((x) =>
-			Object.entries(x)
-				.filter(([_, value]) => value !== undefined)
-				.reduce(
-					(obj, [key, value]) => ((obj[key] = value), obj),
-					{} as Record<string, undefined>,
-				),
-		),
-	);
+// export function merge(target: object, ...sources: object[]) {
+// 	return Object.assign(
+// 		{},
+// 		target,
+// 		...sources.map((x) =>
+// 			Object.entries(x)
+// 				.filter(([_, value]) => value !== undefined)
+// 				.reduce(
+// 					(obj, [key, value]) => ((obj[key] = value), obj),
+// 					{} as Record<string, undefined>,
+// 				),
+// 		),
+// 	);
+// }
+
+// export function merge(target: object, ...sources: object[]) {
+//   const cleanedSources: Record<string, unknown>[] = [];
+
+//   for (const source of sources) {
+//     const cleaned: Record<string, unknown> = {};
+
+//     for (const [key, value] of Object.entries(source)) {
+//       if (value !== undefined) {
+//         cleaned[key] = value;
+//       }
+//     }
+
+//     cleanedSources.push(cleaned);
+//   }
+
+//   return Object.assign({}, target, ...cleanedSources);
+// }
+export function merge(target: object, ...sources: object[]): object {
+	const result = Object.assign({}, target);
+
+	for (const source of sources) {
+		if (!source || typeof source !== "object") {
+			continue;
+		}
+
+		const valid: Record<string, unknown> = {};
+
+		for (const [key, value] of Object.entries(source)) {
+			if (value === undefined) {
+				continue;
+			}
+
+			Object.assign(valid, { [key]: value });
+		}
+
+		Object.assign(result, valid);
+	}
+
+	return result;
 }
 
 export function parsePostgresUrl(dbUrl: string) {
