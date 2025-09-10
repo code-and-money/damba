@@ -1,80 +1,71 @@
 {
-	"name": "@alexvyber/pg-tools",
-	"version": "0.0.0-dev.2",
-	"publishConfig": {
-		"access": "public"
-	},
-	"description": "A new CLI generated with oclif",
-	"keywords": [
-		"oclif"
-	],
-	"homepage": "https://github.com/alexvyber/pg-tools",
-	"bugs": "https://github.com/alexvyber/pg-tools/issues",
-	"repository": "alexvyber/pg-tools",
-	"license": "MIT",
-	"author": "Alexey Sokolov",
-	"type": "module",
-	"exports": {
-		".": "./dist/index.js"
-	},
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"bin": {
-		"pg-tools": "./bin/run.js"
-	},
-	"files": [
-		"./bin",
-		"./dist",
-		"./oclif.manifest.json"
-	],
-	"scripts": {
-		"build": "shx rm -rf dist && tsc -b",
-		"lint": "eslint",
-		"prepack": "oclif manifest && oclif readme",
-		"postpack": "shx rm -f oclif.manifest.json",
-		"test": "mocha --forbid-only \"test/**/*.test.ts\"",
-		"posttest": "pnpm run lint",
-		"version": "oclif readme && git add README.md"
-	},
-	"oclif": {
-		"bin": "pg-tools",
-		"commands": "./dist/commands",
-		"dirname": "pg-tools",
-		"plugins": [
-			"@oclif/plugin-help",
-			"@oclif/plugin-plugins"
-		],
-		"topicSeparator": " ",
-		"topics": {
-			"hello": {
-				"description": "Say hello to the world and others"
-			}
-		}
-	},
-	"dependencies": {
-		"@oclif/core": "^4",
-
-		"pg": "^8.16.3"
-	},
-	"devDependencies": {
-		"@eslint/compat": "^1",
-		"@oclif/prettier-config": "^0.2.1",
-		"@oclif/test": "^4",
-		"@types/chai": "^4",
-		"@types/mocha": "^10",
-		"@types/node": "^18",
-		"@types/pg": "^8.15.5",
-		"chai": "^4",
-		"eslint": "^9",
-		"eslint-config-oclif": "^6",
-		"eslint-config-prettier": "^10",
-		"mocha": "^10",
-		"oclif": "^4",
-		"shx": "^0.3.3",
-		"ts-node": "^10",
-		"typescript": "^5"
-	},
-	"engines": {
-		"node": ">=18.0.0"
-	}
+  "name": "@alexvyber/pg-tools",
+  "version": "0.0.0-dev.4",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "A new CLI generated with oclif",
+  "keywords": [
+    "oclif"
+  ],
+  "homepage": "https://github.com/alexvyber/pg-tools",
+  "bugs": "https://github.com/alexvyber/pg-tools/issues",
+  "repository": "alexvyber/pg-tools",
+  "license": "MIT",
+  "author": "Alexey Sokolov",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "pg-tools": "./bin/run.js"
+  },
+  "files": [
+    "./bin",
+    "./dist",
+    "./oclif.manifest.json"
+  ],
+  "scripts": {
+    "build": "shx rm -rf dist && tsc -b",
+    "lint": "eslint",
+    "prepack": "oclif manifest && oclif readme",
+    "postpack": "shx rm -f oclif.manifest.json",
+    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "posttest": "pnpm run lint",
+    "version": "oclif readme && git add README.md"
+  },
+  "oclif": {
+    "bin": "pg-tools",
+    "commands": "./dist/commands",
+    "dirname": "pg-tools",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-plugins"
+    ],
+    "topicSeparator": " ",
+    "topics": {
+      "hello": {
+        "description": "Say hello to the world and others"
+      }
+    }
+  },
+  "dependencies": {
+    "@oclif/core": "^4",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@oclif/test": "^4",
+    "@types/node": "^18",
+    "@types/pg": "^8.15.5",
+    "chai": "^4",
+    "oclif": "^4",
+    "shx": "^0.3.3",
+    "ts-node": "^10",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }

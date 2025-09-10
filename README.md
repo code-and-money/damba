@@ -21,7 +21,7 @@ $ npm install -g @alexvyber/pg-tools
 $ pg-tools COMMAND
 running command...
 $ pg-tools (--version)
-@alexvyber/pg-tools/0.0.0-dev.2 darwin-arm64 node-v24.7.0
+@alexvyber/pg-tools/0.0.0-dev.4 darwin-arm64 node-v24.7.0
 $ pg-tools --help [COMMAND]
 USAGE
   $ pg-tools COMMAND
@@ -45,12 +45,12 @@ USAGE
 FLAGS
   -e, --existsError       [default: false] whether throw error if DB already exists
   -h, --help              Show CLI help.
-  -i, --initDb=<value>    [default: postgres] Initial DB name
-  -l, --url=<value>       DB URL, e.g. postgres://username:password@localhost:5432/my_db
+  -i, --initialDatabase=<value>    [default: postgres] Initial DB name
+  -l, --url=<value>       DB URL, e.g. postgres://user:password@localhost:5432/my_db
   -n, --database=<value>  new DB name
   -o, --host=<value>      [default: localhost] new DB host
   -p, --port=<value>      [default: 5432] DB port, default `5432`
-  -u, --username=<value>  [default: postgres] DB user name
+  -u, --user=<value>  [default: postgres] DB user name
   -w, --password=<value>  [default: empty] DB password
 
 DESCRIPTION
@@ -65,10 +65,10 @@ EXAMPLES
 
   $ pg-tools create --database=some-db --existsError
 
-  $ pg-tools create --database=some-db --password=123 --port=5433 --host=a.example.com --username=beer
+  $ pg-tools create --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer
 ```
 
-_See code: [src/commands/create.ts](https://github.com/alexvyber/pg-tools/blob/v0.0.0-dev.2/src/commands/create.ts)_
+_See code: [src/commands/create.ts](https://github.com/alexvyber/pg-tools/blob/v0.0.0-dev.4/src/commands/create.ts)_
 
 ## `pg-tools drop`
 
@@ -83,12 +83,12 @@ FLAGS
   -d, --[no-]dropConnections  [default: true] whether automatically drop DB connections
   -e, --notExistsError        [default: false] whether throw error if DB doesn't exist
   -h, --help                  Show CLI help.
-  -i, --initDb=<value>        [default: postgres] Initial DB name
-  -l, --url=<value>           URL of DB that will be dropped, e.g. postgres://username:password@localhost:5432/my_db
+  -i, --initialDatabase=<value>        [default: postgres] Initial DB name
+  -l, --url=<value>           URL of DB that will be dropped, e.g. postgres://user:password@localhost:5432/my_db
   -n, --database=<value>      name of DB that will be dropped
   -o, --host=<value>          [default: localhost] DB host
   -p, --port=<value>          [default: 5432] DB port, default `5432`
-  -u, --username=<value>      [default: postgres] DB user name
+  -u, --user=<value>      [default: postgres] DB user name
   -w, --password=<value>      [default: empty] DB password
 
 DESCRIPTION
@@ -103,8 +103,8 @@ EXAMPLES
 
   $ pg-tools drop --database=some-db --not-exists-error --no-dropConnections
 
-  $ pg-tools drop --database=some-db --password=123 --port=5433 --host=a.example.com --username=beer
+  $ pg-tools drop --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer
 ```
 
-_See code: [src/commands/drop.ts](https://github.com/alexvyber/pg-tools/blob/v0.0.0-dev.2/src/commands/drop.ts)_
+_See code: [src/commands/drop.ts](https://github.com/alexvyber/pg-tools/blob/v0.0.0-dev.4/src/commands/drop.ts)_
 <!-- commandsstop -->
