@@ -1,9 +1,6 @@
 {
   "name": "@alexvyber/pg-tools",
   "version": "0.0.0-dev.5",
-  "publishConfig": {
-    "access": "public"
-  },
   "description": "A new CLI generated with oclif",
   "keywords": [
     "oclif"
@@ -13,6 +10,13 @@
   "repository": "alexvyber/pg-tools",
   "license": "MIT",
   "author": "Alexey Sokolov",
+  "contributors": [
+    {
+      "name": "Alexey Sokolov",
+      "email": "alexey@codeandmoney.com",
+      "url": "https://codeandmoney.com"
+    }
+  ],
   "type": "module",
   "exports": {
     ".": "./dist/index.js"
@@ -40,10 +44,6 @@
     "bin": "pg-tools",
     "commands": "./dist/commands",
     "dirname": "pg-tools",
-    "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-plugins"
-    ],
     "topicSeparator": " ",
     "topics": {
       "hello": {
@@ -56,16 +56,16 @@
     "pg": "^8.16.3"
   },
   "devDependencies": {
-    "@oclif/test": "^4",
-    "@types/node": "^18",
+    "@types/node": "^24.3.1",
     "@types/pg": "^8.15.5",
-    "chai": "^4",
     "oclif": "^4",
-    "shx": "^0.3.3",
-    "ts-node": "^10",
+    "shx": "^0.4.0",
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
