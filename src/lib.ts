@@ -161,7 +161,7 @@ export async function drop({ config, credentials }: { config: DropConfig; creden
     if (db.rowCount === 0 && !config.notExistsError) {
       return
     }
-		
+
     if (config.dropConnections !== false) {
       await dropConnections(client, config.database)
     }
