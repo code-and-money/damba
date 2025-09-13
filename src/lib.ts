@@ -73,21 +73,22 @@ export async function create({ config, credentials }: { config: CreateConfig; cr
   try {
     await client.connect()
 
-    const db = await client.query(`
-      select datname
-      from pg_catalog.pg_database
-      where lower( datname ) = lower( "${config.database}" );
+    const result = await client.query(`
+      select
+        datname
+      from
+        pg_catalog.pg_database
+      where
+        lower(datname) = lower('${config.database}');
     `)
 
-    if (!db?.rowCount) {
-      throw new Error("Error getting query result")
-    }
+    const tableExists = Boolean(result?.rowCount)
 
-    if (db?.rowCount > 0 && config.existsError) {
+    if (tableExists && config.existsError) {
       throw PgToolsError.dbExists()
     }
 
-    if (db?.rowCount > 0 && !config.existsError) {
+    if (tableExists && !config.existsError) {
       return
     }
 
@@ -148,21 +149,26 @@ export async function drop({ config, credentials }: { config: DropConfig; creden
   try {
     await client.connect()
 
-    const db = await client.query(`
-      select datname
-      from pg_catalog.pg_database
-      where lower( datname ) = lower( "${config.database}" );
+    const result = await client.query(`
+      select
+        datname
+      from
+        pg_catalog.pg_database
+      where
+        lower(datname) = lower('${config.database}');
     `)
 
-    if (db.rowCount === 0 && config.notExistsError) {
-      throw PgToolsError.dbDoesNotExist()
+    const tableDoesntExists = result.rowCount === 0
+
+    if (tableDoesntExists && config.notExistsError) {
+      throw PgToolsError.dbExists()
     }
 
-    if (db.rowCount === 0 && !config.notExistsError) {
+    if (tableDoesntExists && !config.notExistsError) {
       return
     }
 
-    if (config.dropConnections !== false) {
+    if (config.dropConnections === true) {
       await dropConnections(client, config.database)
     }
 
@@ -193,7 +199,7 @@ export async function drop({ config, credentials }: { config: DropConfig; creden
  * cannot terminate your own active connection to the target database.
  *
  * @param client - An active PostgreSQL {@link Client} connected to the server.
- * @param {string} dbName - The name of the database whose connections should be dropped.
+ * @param {string} database - The name of the database whose connections should be dropped.
  *
  * @returns A promise resolving to the result of the `client.query` execution.
  *
@@ -207,16 +213,16 @@ export async function drop({ config, credentials }: { config: DropConfig; creden
  * await client.end();
  * ```
  */
-async function dropConnections(client: Client, dbName: string) {
+async function dropConnections(client: Client, database: string, schema = "public") {
   return client.query(`
-		revoke connect on database "${dbName}" from public;
+    revoke connect on database "${database}" from "${schema}";
 
     select
-      pg_terminate_backend( pg_stat_activity.pid )
+      pg_terminate_backend(pg_stat_activity.pid)
     from
       pg_stat_activity
     where
-      pg_stat_activity.datname = "${dbName}"
+      pg_stat_activity.datname = '${database}'
       and pid <> pg_backend_pid();
   `)
 }
