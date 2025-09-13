@@ -91,7 +91,7 @@ export async function create({ config, credentials }: { config: CreateConfig; cr
       return
     }
 
-    await client.query(`create database "${config.database}";`)
+    await client.query(`create database '${config.database}';`)
   } catch (error) {
     if (error instanceof PgToolsError) {
       throw PgToolsError.fromPgToolsError(error)
