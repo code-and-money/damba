@@ -21,7 +21,7 @@ $ npm install -g @alexvyber/pg-tools
 $ pg-tools COMMAND
 running command...
 $ pg-tools (--version)
-@alexvyber/pg-tools/0.0.0-dev.8 darwin-arm64 node-v24.7.0
+@alexvyber/pg-tools/0.0.0-dev.9 darwin-arm64 node-v24.7.0
 $ pg-tools --help [COMMAND]
 USAGE
   $ pg-tools COMMAND
@@ -68,7 +68,7 @@ EXAMPLES
   $ pg-tools create --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer
 ```
 
-_See code: [src/commands/create.ts](https://github.com/alexvyber/pg-tools/blob/v0.0.0-dev.8/src/commands/create.ts)_
+_See code: [src/commands/create.ts](https://github.com/alexvyber/pg-tools/blob/v0.0.0-dev.9/src/commands/create.ts)_
 
 ## `pg-tools drop`
 
@@ -106,5 +106,5 @@ EXAMPLES
   $ pg-tools drop --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer
 ```
 
-_See code: [src/commands/drop.ts](https://github.com/alexvyber/pg-tools/blob/v0.0.0-dev.8/src/commands/drop.ts)_
+_See code: [src/commands/drop.ts](https://github.com/alexvyber/pg-tools/blob/v0.0.0-dev.9/src/commands/drop.ts)_
 <!-- commandsstop -->
