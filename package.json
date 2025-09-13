@@ -1,9 +1,10 @@
 {
   "name": "@alexvyber/pg-tools",
   "version": "0.0.0-dev.10",
-  "description": "A new CLI generated with oclif",
+  "description": "Utils to work with PostgresQL from Deno, Node and Bun",
   "keywords": [
-    "oclif"
+    "oclif",
+    "postgres"
   ],
   "homepage": "https://github.com/alexvyber/pg-tools",
   "bugs": "https://github.com/alexvyber/pg-tools/issues",
@@ -52,16 +53,17 @@
     }
   },
   "dependencies": {
-    "@oclif/core": "^4",
+    "@oclif/core": "^4.5.2",
     "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",
     "@types/pg": "^8.15.5",
-    "oclif": "^4",
+    "oclif": "^4.22.16",
     "shx": "^0.4.0",
-    "typescript": "^5"
+    "typescript": "^5.9.2"
   },
+  "packageManager": "pnpm@10.16.0+sha512.8066e7b034217b700a9a4dbb3a005061d641ba130a89915213a10b3ca4919c19c037bec8066afdc559b89635fdb806b16ea673f2468fbb28aabfa13c53e3f769",
   "engines": {
     "node": ">=22.0.0"
   },
