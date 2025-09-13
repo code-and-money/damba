@@ -76,7 +76,7 @@ export async function create({ config, credentials }: { config: CreateConfig; cr
     const db = await client.query(`
       select datname
       from pg_catalog.pg_database
-      where lower(datname) = lower('${config.database}');
+      where lower( datname ) = lower( '${config.database}' );
     `)
 
     if (!db?.rowCount) {
@@ -151,7 +151,7 @@ export async function drop({ config, credentials }: { config: DropConfig; creden
     const db = await client.query(`
       select datname
       from pg_catalog.pg_database
-      where lower(datname) = lower('${config.database}');
+      where lower( datname ) = lower( '${config.database}' );
     `)
 
     if (db.rowCount === 0 && config.notExistsError) {
@@ -166,7 +166,7 @@ export async function drop({ config, credentials }: { config: DropConfig; creden
       await dropConnections(client, config.database)
     }
 
-    await client.query(`drop database "${config.database}";`)
+    await client.query(`drop database '${config.database}';`)
   } catch (error) {
     if (error instanceof PgToolsError) {
       throw PgToolsError.fromPgToolsError(error)
@@ -212,7 +212,7 @@ async function dropConnections(client: Client, dbName: string) {
 		revoke connect on database '${dbName}' from public;
 
     select
-      pg_terminate_backend(pg_stat_activity.pid)
+      pg_terminate_backend( pg_stat_activity.pid )
     from
       pg_stat_activity
     where
