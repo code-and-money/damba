@@ -1,6 +1,6 @@
 {
   "name": "@alexvyber/pg-tools",
-  "version": "0.0.0-dev.10",
+  "version": "0.0.0-dev.11",
   "description": "Utils to work with PostgresQL from Deno, Node and Bun",
   "keywords": [
     "oclif",
