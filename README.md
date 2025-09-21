@@ -40,7 +40,8 @@ Create an empty database
 ### USAGE
 
 ```sh
-damba create [-h] [-e] [-i <value>] [-n <value> | -l <value>] [-u <value> | ] [-p <value> | ] [-o <value> | ] [-w <value> | ]
+damba create [-h] [-e] [-i <value>] [-n <value> | -l <value>] [-u <value> | ]
+             [-p <value> | ] [-o <value> | ] [-w <value> | ]
 ```
 
 ```sh
@@ -85,7 +86,8 @@ Drop a database
 ### USAGE
 
 ```sh
-damba drop [-h] [-e] [-d] [-i <value>] [-n <value> | -l <value>] [-u <value> | ] [-p <value> | ] [-o <value> | ] [-w <value> | ]
+damba drop [-h] [-e] [-d] [-i <value>] [-n <value> | -l <value>] [-u <value> | ] 
+           [-p <value> | ] [-o <value> | ] [-w <value> | ]
 ```
 
 ```sh
