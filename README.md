@@ -1,10 +1,4 @@
-# @alexvyber/pg-tools
-
-A new CLI generated with oclif
-
-[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/@alexvyber/pg-tools.svg)](https://npmjs.org/package/@alexvyber/pg-tools)
-[![Downloads/week](https://img.shields.io/npm/dw/@alexvyber/pg-tools.svg)](https://npmjs.org/package/@alexvyber/pg-tools)
+# @codeandmoney/damba
 
 <!-- toc -->
 
@@ -18,14 +12,14 @@ A new CLI generated with oclif
 <!-- usage -->
 
 ```sh-session
-$ npm install -g @alexvyber/pg-tools
-$ pg-tools COMMAND
+$ npm install -g @codeandmoney/damba
+$ damba COMMAND
 running command...
-$ pg-tools (--version)
-@alexvyber/pg-tools/0.0.0-dev.11 darwin-arm64 node-v24.7.0
-$ pg-tools --help [COMMAND]
+$ damba (--version)
+@codeandmoney/damba/0.0.0-dev.11 darwin-arm64 node-v24.7.0
+$ damba --help [COMMAND]
 USAGE
-  $ pg-tools COMMAND
+  $ damba COMMAND
 ...
 ```
 
@@ -35,16 +29,16 @@ USAGE
 
 <!-- commands -->
 
-- [`pg-tools create`](#pg-tools-create)
-- [`pg-tools drop`](#pg-tools-drop)
+- [`damba create`](#damba-create)
+- [`damba drop`](#damba-drop)
 
-## `pg-tools create`
+## `damba create`
 
 create an empty database
 
 ```
 USAGE
-  $ pg-tools create [-h] [-e] [-i <value>] [-n <value> | -l <value>] [-u <value> | ] [-p <value> | ] [-o
+  $ damba create [-h] [-e] [-i <value>] [-n <value> | -l <value>] [-u <value> | ] [-p <value> | ] [-o
     <value> | ] [-w <value> | ]
 
 FLAGS
@@ -62,26 +56,24 @@ DESCRIPTION
   create an empty database
 
 EXAMPLES
-  $ pg-tools create --database=some-db
+  $ damba create --database=some-db
 
-  $ DB_NAME=some-db pg-tools create
+  $ DB_NAME=some-db damba create
 
-  $ pg-tools create --url postgresql://localhost:5432/some-db
+  $ damba create --url postgresql://localhost:5432/some-db
 
-  $ pg-tools create --database=some-db --existsError
+  $ damba create --database=some-db --existsError
 
-  $ pg-tools create --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer
+  $ damba create --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer
 ```
 
-_See code: [src/commands/create.ts](https://github.com/alexvyber/pg-tools/blob/v0.0.0-dev.11/src/commands/create.ts)_
-
-## `pg-tools drop`
+## `damba drop`
 
 drop a database
 
 ```
 USAGE
-  $ pg-tools drop [-h] [-e] [-d] [-i <value>] [-n <value> | -l <value>] [-u <value> | ] [-p <value> | ]
+  $ damba drop [-h] [-e] [-d] [-i <value>] [-n <value> | -l <value>] [-u <value> | ] [-p <value> | ]
     [-o <value> | ] [-w <value> | ]
 
 FLAGS
@@ -100,17 +92,15 @@ DESCRIPTION
   drop a database
 
 EXAMPLES
-  $ pg-tools drop --database=some-db
+  $ damba drop --database=some-db
 
-  $ DB_NAME=some-db pg-tools drop
+  $ DB_NAME=some-db damba drop
 
-  $ pg-tools drop --url postgresql://localhost:5432/some-db
+  $ damba drop --url postgresql://localhost:5432/some-db
 
-  $ pg-tools drop --database=some-db --not-exists-error --no-dropConnections
+  $ damba drop --database=some-db --not-exists-error --no-dropConnections
 
-  $ pg-tools drop --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer
+  $ damba drop --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer
 ```
-
-_See code: [src/commands/drop.ts](https://github.com/alexvyber/pg-tools/blob/v0.0.0-dev.11/src/commands/drop.ts)_
 
 <!-- commandsstop -->
