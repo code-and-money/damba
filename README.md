@@ -12,15 +12,14 @@
 <!-- usage -->
 
 ```sh
-$ npm install -g @codeandmoney/damba
-$ damba COMMAND
-running command...
-$ damba (--version)
-@codeandmoney/damba/0.0.0-dev.11 darwin-arm64 node-v24.7.0
-$ damba --help [COMMAND]
+deno add jsr:@codeandmoney/damba
 
-USAGE
-$ damba COMMAND
+damba COMMAND
+# running command...
+
+damba (--version)
+
+damba --help [COMMAND]
 ...
 ```
 
