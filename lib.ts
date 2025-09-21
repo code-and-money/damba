@@ -263,7 +263,14 @@ export function merge<T extends object, U extends object>( target: T, source: U 
   return result as any
 }
 
-export function parsePostgresUrl( url: string ) {
+export function parsePostgresUrl( url: string ): {
+    scheme: string;
+    user: string;
+    password: string;
+    host: string;
+    port: string;
+    database: string;
+} {
   const urlQuery = URL.parse( url )
   if ( !urlQuery ) {
     throw new Error( "Url can not be parsed" )
