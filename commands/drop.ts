@@ -1,15 +1,16 @@
 import { Command, Flags } from "@oclif/core"
 import { drop, merge, parsePostgresUrl } from "../lib.ts"
+import { assert } from "@std/assert"
 
 export default class Drop extends Command {
   static override description = "drop a database"
 
   static override examples = [
-    `$ pg-tools drop --database=some-db`,
-    `$ DB_NAME=some-db pg-tools drop`,
-    `$ pg-tools drop --url postgresql://localhost:5432/some-db`,
-    `$ pg-tools drop --database=some-db --not-exists-error --no-dropConnections`,
-    `$ pg-tools drop --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer`,
+    `$ damba drop --database=dbname`,
+    `$ DB_NAME=dbname damba drop`,
+    `$ damba drop --url postgresql://localhost:5432/dbname`,
+    `$ damba drop --database=dbname --not-exists-error --no-dropConnections`,
+    `$ damba drop --database=dbname --password=123 --port=5433 --host=a.example.com --user=beer`,
   ]
 
   static override flags = {
@@ -80,9 +81,7 @@ export default class Drop extends Command {
   }
 
   public async run(): Promise<void> {
-    const {
-      flags: { notExistsError, dropConnections, initialDatabase, url, ...rest },
-    } = await this.parse( Drop )
+    const { flags: { notExistsError, dropConnections, initialDatabase, url, ...rest } } = await this.parse( Drop )
 
     const params = url ? parsePostgresUrl( url ) : {}
 
@@ -90,21 +89,11 @@ export default class Drop extends Command {
 
     console.info( `Drop database '${database}'` )
 
-    if ( !database ) {
-      throw new Error(
-        'Missing required flags/ENV - database("DB_NAME") or url("DB_URL")',
-      )
-    }
+    assert( database, 'Missing required flags/ENV - database("DB_NAME") or url("DB_URL")' )
 
     await drop( {
       config: { database, notExistsError, dropConnections },
-      credentials: {
-        user: user,
-        database: initialDatabase,
-        port,
-        host,
-        password,
-      },
+      credentials: { user: user, database: initialDatabase, port, host, password },
     } )
 
     console.info( `Database '${database}' dropped` )

@@ -1,14 +1,15 @@
 import { Command, Flags } from "@oclif/core"
 import { create, merge, parsePostgresUrl } from "../lib.ts"
+import { assert } from "@std/assert"
 
 export default class Create extends Command {
   static override description = "create an empty database"
   static override examples = [
-    `$ pg-tools create --database=some-db`,
-    `$ DB_NAME=some-db pg-tools create`,
-    `$ pg-tools create --url postgresql://localhost:5432/some-db`,
-    `$ pg-tools create --database=some-db --existsError`,
-    `$ pg-tools create --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer`,
+    `$ damba create --database=dbname`,
+    `$ DB_NAME=dbname damba create`,
+    `$ damba create --url postgresql://localhost:5432/dbname`,
+    `$ damba create --database=dbname --existsError`,
+    `$ damba create --database=dbname --password=123 --port=5433 --host=a.example.com --user=beer`,
   ]
 
   static override flags = {
@@ -68,9 +69,7 @@ export default class Create extends Command {
   }
 
   public async run() {
-    const {
-      flags: { existsError, initialDatabase, url, ...flags },
-    } = await this.parse( Create )
+    const { flags: { existsError, initialDatabase, url, ...flags } } = await this.parse( Create )
 
     const params = url ? parsePostgresUrl( url ) : {}
 
@@ -78,11 +77,7 @@ export default class Create extends Command {
 
     console.info( `Create database '${database}'` )
 
-    if ( !database ) {
-      throw new Error(
-        'Missing required flags/ENV - database("DB_NAME") or url("DB_URL")',
-      )
-    }
+    assert( database, 'Missing required flags/ENV - database("DB_NAME") or url("DB_URL")' )
 
     await create( {
       config: { database, existsError },

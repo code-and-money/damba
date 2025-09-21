@@ -56,15 +56,15 @@ DESCRIPTION
   create an empty database
 
 EXAMPLES
-  $ damba create --database=some-db
+  $ damba create --database=dbname
 
-  $ DB_NAME=some-db damba create
+  $ DB_NAME=dbname damba create
 
-  $ damba create --url postgresql://localhost:5432/some-db
+  $ damba create --url postgresql://localhost:5432/dbname
 
-  $ damba create --database=some-db --existsError
+  $ damba create --database=dbname --existsError
 
-  $ damba create --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer
+  $ damba create --database=dbname --password=123 --port=5433 --host=a.example.com --user=beer
 ```
 
 ## `damba drop`
@@ -92,15 +92,15 @@ DESCRIPTION
   drop a database
 
 EXAMPLES
-  $ damba drop --database=some-db
+  $ damba drop --database=dbname
 
-  $ DB_NAME=some-db damba drop
+  $ DB_NAME=dbname damba drop
 
-  $ damba drop --url postgresql://localhost:5432/some-db
+  $ damba drop --url postgresql://localhost:5432/dbname
 
-  $ damba drop --database=some-db --not-exists-error --no-dropConnections
+  $ damba drop --database=dbname --not-exists-error --no-dropConnections
 
-  $ damba drop --database=some-db --password=123 --port=5433 --host=a.example.com --user=beer
+  $ damba drop --database=dbname --password=123 --port=5433 --host=a.example.com --user=beer
 ```
 
 <!-- commandsstop -->

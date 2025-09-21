@@ -1,7 +1,7 @@
 import { Client } from "pg"
 import type { CreateConfig, DatabaseCredentials, DropConfig } from "./types.ts"
 
-const pgErrors: Record<string, { name: string; code: string; message: string }> = {
+const dambaErrors: Record<string, { name: string; code: string; message: string }> = {
   // deno-fmt-ignore
   "42P04": { name: "PDG_ERR::DuplicateDatabase", code: "42P04", message: "Database already exist." },
   // deno-fmt-ignore
@@ -12,33 +12,40 @@ const pgErrors: Record<string, { name: string; code: string; message: string }> 
   "55006": { name: "PDG_ERR::DropDatabaseInUse", code: "55006", message: "Cannot delete a database that is being accessed by other users." },
 }
 
-export class PgToolsError implements Error {
-  constructor( readonly name: string, readonly message: string, readonly code: string, readonly stack?: string ) {}
+export class DambaError extends Error {
+  constructor(
+    readonly code: string,
+    override readonly name: string,
+    override readonly message: string,
+    override readonly stack?: string,
+  ) {
+    super()
+  }
 
-  public static fromPgToolsError( pgToolsError: Error & { code?: string } ): PgToolsError {
-    return new PgToolsError(
-      pgToolsError.code ? pgErrors[pgToolsError.code]?.name : "PDG_ERR::UnexpectedError",
-      pgToolsError.code ? pgErrors[pgToolsError.code]?.message : pgToolsError.message,
-      pgToolsError.code || "unknown",
-      pgToolsError.stack,
+  public static fromDambaError( dambaError: Error & { code?: string } ): DambaError {
+    return new DambaError(
+      dambaError.code ? dambaErrors[dambaError.code]?.name : "PDG_ERR::UnexpectedError",
+      dambaError.code ? dambaErrors[dambaError.code]?.message : dambaError.message,
+      dambaError.code || "unknown",
+      dambaError.stack,
     )
   }
 
-  public static dbExists(): PgToolsError {
+  public static dbExists(): DambaError {
     const code = "42P04"
-    return new PgToolsError(
-      pgErrors[code]?.name,
-      pgErrors[code]?.message,
+    return new DambaError(
+      dambaErrors[code]?.name,
+      dambaErrors[code]?.message,
       code,
       Error().stack,
     )
   }
 
-  public static dbDoesNotExist(): PgToolsError {
+  public static dbDoesNotExist(): DambaError {
     const code = "3D000"
-    return new PgToolsError(
-      pgErrors[code]?.name,
-      pgErrors[code]?.message,
+    return new DambaError(
+      dambaErrors[code]?.name,
+      dambaErrors[code]?.message,
       code,
       Error().stack,
     )
@@ -65,7 +72,7 @@ const defaultCredentials: DatabaseCredentials = {
  * @param params.config - The configuration for database creation. {@link CreateConfig }
  * @param params.credentials - Optional connection credentials that override {@link defaultCredentials}.
  *
- * @throws {PgToolsError} If the database already exists and `config.existsError` is `true`.
+ * @throws {DambaError} If the database already exists and `config.existsError` is `true`.
  * @throws {Error} If the query result is invalid, or another unknown error occurs.
  *
  * @example
@@ -96,7 +103,7 @@ export async function create(
     const tableExists = Boolean( result?.rowCount )
 
     if ( tableExists && config.existsError ) {
-      throw PgToolsError.dbExists()
+      throw DambaError.dbExists()
     }
 
     if ( tableExists && !config.existsError ) {
@@ -105,8 +112,8 @@ export async function create(
 
     await client.query( `create database "${config.database}";` )
   } catch ( error ) {
-    if ( error instanceof PgToolsError ) {
-      throw PgToolsError.fromPgToolsError( error )
+    if ( error instanceof DambaError ) {
+      throw DambaError.fromDambaError( error )
     }
 
     if ( error instanceof Error ) {
@@ -125,7 +132,7 @@ export async function create(
  * - Connects to the PostgreSQL server using the given credentials (or defaults).
  * - Checks whether the target database exists.
  *   - If it does not exist:
- *     - Throws a {@link PgToolsError.dbDoesNotExist} if `config.notExistsError` is `true`.
+ *     - Throws a {@link DambaError.dbDoesNotExist} if `config.notExistsError` is `true`.
  *     - Returns silently if `config.notExistsError` is `false` or unset.
  * - If the database exists and `config.dropConnections` is not `false`,
  *   calls {@link dropConnections} to forcibly disconnect all clients.
@@ -142,8 +149,8 @@ export async function create(
  * @param params.config - The drop configuration (see {@link DropConfig}).
  * @param params.credentials - Optional connection credentials that override {@link defaultCredentials}.
  *
- * @throws {PgToolsError} If the database does not exist (and `notExistsError` is `true`).
- * @throws {PgToolsError} If wrapped from another `PgToolsError`.
+ * @throws {DambaError} If the database does not exist (and `notExistsError` is `true`).
+ * @throws {DambaError} If wrapped from another `DambaError`.
  * @throws {Error} For query errors, invalid results, or unexpected issues.
  *
  * @example
@@ -174,7 +181,7 @@ export async function drop(
     const tableDoesntExists = result.rowCount === 0
 
     if ( tableDoesntExists && config.notExistsError ) {
-      throw PgToolsError.dbExists()
+      throw DambaError.dbExists()
     }
 
     if ( tableDoesntExists && !config.notExistsError ) {
@@ -187,8 +194,8 @@ export async function drop(
 
     await client.query( `drop database "${config.database}";` )
   } catch ( error ) {
-    if ( error instanceof PgToolsError ) {
-      throw PgToolsError.fromPgToolsError( error )
+    if ( error instanceof DambaError ) {
+      throw DambaError.fromDambaError( error )
     }
 
     if ( error instanceof Error ) {
@@ -263,30 +270,32 @@ export function merge<T extends object, U extends object>( target: T, source: U 
   return result as any
 }
 
-export function parsePostgresUrl( url: string ): {
-    scheme: string;
-    user: string;
-    password: string;
-    host: string;
-    port: string;
-    database: string;
-} {
-  const urlQuery = URL.parse( url )
-  if ( !urlQuery ) {
+type ParsedPostgresConfig = {
+  scheme: string
+  user: string
+  password: string
+  host: string
+  port: string
+  database: string
+}
+
+export function parsePostgresUrl( str: string ): ParsedPostgresConfig {
+  const url = URL.parse( str )
+  if ( !url ) {
     throw new Error( "Url can not be parsed" )
   }
 
-  const params = urlQuery.pathname.split( "/" )
+  const params = url.pathname.split( "/" )
   if ( params.length > 2 ) {
     throw new Error( "Invalid database url string was provided" )
   }
 
   return {
-    scheme: urlQuery.protocol,
-    user: urlQuery.username,
-    password: urlQuery.password,
-    host: urlQuery.hostname,
-    port: urlQuery.port,
+    scheme: url.protocol,
+    user: url.username,
+    password: url.password,
+    host: url.hostname,
+    port: url.port,
     database: params[0],
   }
 }

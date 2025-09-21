@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "Utils to work with PostgresQL from Deno, Node and Bun",
   "keywords": ["oclif", "postgres"],
-  "homepage": "https://github.com/alexvyber/pg-tools",
-  "bugs": "https://github.com/alexvyber/pg-tools/issues",
+  "homepage": "https://github.com/alexvyber/damba",
+  "bugs": "https://github.com/alexvyber/damba/issues",
   "fmt": {
     "semiColons": false,
     "trailingCommas": "onlyMultiLine",
@@ -13,7 +13,7 @@
     "lineWidth": 120,
     "spaceAround": true
   },
-  "repository": "alexvyber/pg-tools",
+  "repository": "alexvyber/damba",
   "license": "MIT",
   "author": "Alexey Sokolov",
   "contributors": [{ "name": "Alexey Sokolov", "email": "alexey@codeandmoney.com", "url": "https://codeandmoney.com" }],
@@ -24,7 +24,7 @@
   "main": "./mod.ts",
   "types": "dist/index.d.ts",
   "bin": {
-    "pg-tools": "./bin/run.js"
+    "damba": "./bin/run.js"
   },
   "files": [
     "./bin",
@@ -41,9 +41,9 @@
     "version": "oclif readme && git add README.md"
   },
   "oclif": {
-    "bin": "pg-tools",
+    "bin": "damba",
     "commands": "./dist/commands",
-    "dirname": "pg-tools",
+    "dirname": "damba",
     "topicSeparator": " ",
     "topics": { "hello": { "description": "Say hello to the world and others" } }
   },
@@ -55,6 +55,7 @@
   },
   "imports": {
     "@oclif/core": "npm:@oclif/core@^4.5.4",
+    "@std/assert": "jsr:@std/assert@^1.0.14",
     "oclif": "npm:oclif@^4.22.24",
     "pg": "npm:pg@^8.16.3",
     "shx": "npm:shx@^0.4.0"
