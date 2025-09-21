@@ -20,7 +20,6 @@ damba COMMAND
 damba (--version)
 
 damba --help [COMMAND]
-...
 ```
 
 <!-- usagestop -->
