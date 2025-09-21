@@ -11,15 +11,16 @@
 
 <!-- usage -->
 
-```sh-session
+```sh
 $ npm install -g @codeandmoney/damba
 $ damba COMMAND
 running command...
 $ damba (--version)
 @codeandmoney/damba/0.0.0-dev.11 darwin-arm64 node-v24.7.0
 $ damba --help [COMMAND]
+
 USAGE
-  $ damba COMMAND
+$ damba COMMAND
 ...
 ```
 
@@ -34,14 +35,16 @@ USAGE
 
 ## `damba create`
 
-create an empty database
+Create an empty database
 
+### USAGE
+
+```sh
+damba create [-h] [-e] [-i <value>] [-n <value> | -l <value>] [-u <value> | ] [-p <value> | ] [-o <value> | ] [-w <value> | ]
 ```
-USAGE
-  $ damba create [-h] [-e] [-i <value>] [-n <value> | -l <value>] [-u <value> | ] [-p <value> | ] [-o
-    <value> | ] [-w <value> | ]
 
-FLAGS
+```sh
+### FLAGS
   -e, --existsError              [default: false] whether throw error if DB already exists
   -h, --help                     Show CLI help.
   -i, --initialDatabase=<value>  [default: postgres] Initial DB name
@@ -51,31 +54,41 @@ FLAGS
   -p, --port=<value>             [default: 5432] DB port, default `5432`
   -u, --user=<value>             [default: postgres] DB user name
   -w, --password=<value>         [default: empty] DB password
+```
 
-DESCRIPTION
-  create an empty database
+### Examples
 
-EXAMPLES
-  $ damba create --database=dbname
+```sh
+damba create --database=dbname
+```
 
-  $ DB_NAME=dbname damba create
+```sh
+DB_NAME=dbname damba create
+```
 
-  $ damba create --url postgresql://localhost:5432/dbname
+```sh
+damba create --url postgresql://localhost:5432/dbname
+```
 
-  $ damba create --database=dbname --existsError
+```sh
+damba create --database=dbname --existsError
+```
 
-  $ damba create --database=dbname --password=123 --port=5433 --host=a.example.com --user=beer
+```sh
+damba create --database=dbname --password=123 --port=5433 --host=a.example.com --user=beer
 ```
 
 ## `damba drop`
 
-drop a database
+Drop a database
 
+### USAGE
+
+```sh
+damba drop [-h] [-e] [-d] [-i <value>] [-n <value> | -l <value>] [-u <value> | ] [-p <value> | ] [-o <value> | ] [-w <value> | ]
 ```
-USAGE
-  $ damba drop [-h] [-e] [-d] [-i <value>] [-n <value> | -l <value>] [-u <value> | ] [-p <value> | ]
-    [-o <value> | ] [-w <value> | ]
 
+```sh
 FLAGS
   -d, --[no-]dropConnections     [default: true] whether automatically drop DB connections
   -e, --notExistsError           [default: false] whether throw error if DB doesn't exist
@@ -87,20 +100,28 @@ FLAGS
   -p, --port=<value>             [default: 5432] DB port, default `5432`
   -u, --user=<value>             [default: postgres] DB user name
   -w, --password=<value>         [default: empty] DB password
+```
 
-DESCRIPTION
-  drop a database
+### EXAMPLES
 
-EXAMPLES
-  $ damba drop --database=dbname
+```sh
+damba drop --database=dbname
+```
 
-  $ DB_NAME=dbname damba drop
+```sh
+DB_NAME=dbname damba drop
+```
 
-  $ damba drop --url postgresql://localhost:5432/dbname
+```sh
+damba drop --url postgresql://localhost:5432/dbname
+```
 
-  $ damba drop --database=dbname --not-exists-error --no-dropConnections
+```sh
+damba drop --database=dbname --not-exists-error --no-dropConnections
+```
 
-  $ damba drop --database=dbname --password=123 --port=5433 --host=a.example.com --user=beer
+```sh
+damba drop --database=dbname --password=123 --port=5433 --host=a.example.com --user=beer
 ```
 
 <!-- commandsstop -->

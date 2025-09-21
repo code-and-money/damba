@@ -1,10 +1,25 @@
 {
   "name": "@codeandmoney/damba",
   "version": "0.0.1",
-  "description": "Utils to work with PostgresQL from Deno, Node and Bun",
+  "description": "Utils to work with PostgresQL from Deno",
   "keywords": ["oclif", "postgres"],
-  "homepage": "https://github.com/alexvyber/damba",
-  "bugs": "https://github.com/alexvyber/damba/issues",
+  "homepage": "https://github.com/code-and-moeny/damba",
+  "bugs": "https://github.com/code-and-moeny/damba/issues",
+  "repository": "code-and-moeny/damba",
+  "license": "MIT",
+  "author": "Alexey Sokolov",
+  "contributors": [{ "name": "Alexey Sokolov", "email": "alexey@codeandmoney.com", "url": "https://codeandmoney.com" }],
+  "type": "module",
+  "imports": {
+    "@oclif/core": "npm:@oclif/core@^4.5.4",
+    "@std/assert": "jsr:@std/assert@^1.0.14",
+    "oclif": "npm:oclif@^4.22.24",
+    "pg": "npm:pg@^8.16.3"
+  },
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "main": "./mod.ts",
   "fmt": {
     "semiColons": false,
     "trailingCommas": "onlyMultiLine",
@@ -12,52 +27,5 @@
     "indentWidth": 2,
     "lineWidth": 120,
     "spaceAround": true
-  },
-  "repository": "alexvyber/damba",
-  "license": "MIT",
-  "author": "Alexey Sokolov",
-  "contributors": [{ "name": "Alexey Sokolov", "email": "alexey@codeandmoney.com", "url": "https://codeandmoney.com" }],
-  "type": "module",
-  "exports": {
-    ".": "./mod.ts"
-  },
-  "main": "./mod.ts",
-  "types": "dist/index.d.ts",
-  "bin": {
-    "damba": "./bin/run.js"
-  },
-  "files": [
-    "./bin",
-    "./dist",
-    "./oclif.manifest.json"
-  ],
-  "scripts": {
-    "build": "shx rm -rf dist && tsc -b",
-    "lint": "eslint",
-    "prepack": "oclif manifest && oclif readme",
-    "postpack": "shx rm -f oclif.manifest.json",
-    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "posttest": "pnpm run lint",
-    "version": "oclif readme && git add README.md"
-  },
-  "oclif": {
-    "bin": "damba",
-    "commands": "./dist/commands",
-    "dirname": "damba",
-    "topicSeparator": " ",
-    "topics": { "hello": { "description": "Say hello to the world and others" } }
-  },
-  "engines": {
-    "node": ">=22.0.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "imports": {
-    "@oclif/core": "npm:@oclif/core@^4.5.4",
-    "@std/assert": "jsr:@std/assert@^1.0.14",
-    "oclif": "npm:oclif@^4.22.24",
-    "pg": "npm:pg@^8.16.3",
-    "shx": "npm:shx@^0.4.0"
   }
 }
