@@ -1,22 +1,21 @@
 import { Client } from "pg"
-import type { CreateConfig, DatabaseCredentials, DropConfig } from "./types.js"
+import type { CreateConfig, DatabaseCredentials, DropConfig } from "./types.ts"
 
 const pgErrors: Record<string, { name: string; code: string; message: string }> = {
+  // deno-fmt-ignore
   "42P04": { name: "PDG_ERR::DuplicateDatabase", code: "42P04", message: "Database already exist." },
+  // deno-fmt-ignore
   "3D000": { name: "PDG_ERR::InvalidCatalogName", code: "3D000", message: "Database does not exist." },
+  // deno-fmt-ignore
   "23505": { name: "PDG_ERR::UniqueViolation", code: "23505", message: "Attempt to create multiple databases concurrently." },
+  // deno-fmt-ignore
   "55006": { name: "PDG_ERR::DropDatabaseInUse", code: "55006", message: "Cannot delete a database that is being accessed by other users." },
 }
 
 export class PgToolsError implements Error {
-  constructor(
-    readonly name: string,
-    readonly message: string,
-    readonly code: string,
-    readonly stack?: string,
-  ) {}
+  constructor( readonly name: string, readonly message: string, readonly code: string, readonly stack?: string ) {}
 
-  public static fromPgToolsError(pgToolsError: Error & { code?: string }): PgToolsError {
+  public static fromPgToolsError( pgToolsError: Error & { code?: string } ): PgToolsError {
     return new PgToolsError(
       pgToolsError.code ? pgErrors[pgToolsError.code]?.name : "PDG_ERR::UnexpectedError",
       pgToolsError.code ? pgErrors[pgToolsError.code]?.message : pgToolsError.message,
@@ -27,12 +26,22 @@ export class PgToolsError implements Error {
 
   public static dbExists(): PgToolsError {
     const code = "42P04"
-    return new PgToolsError(pgErrors[code]?.name, pgErrors[code]?.message, code, Error().stack)
+    return new PgToolsError(
+      pgErrors[code]?.name,
+      pgErrors[code]?.message,
+      code,
+      Error().stack,
+    )
   }
 
   public static dbDoesNotExist(): PgToolsError {
     const code = "3D000"
-    return new PgToolsError(pgErrors[code]?.name, pgErrors[code]?.message, code, Error().stack)
+    return new PgToolsError(
+      pgErrors[code]?.name,
+      pgErrors[code]?.message,
+      code,
+      Error().stack,
+    )
   }
 }
 
@@ -67,42 +76,44 @@ const defaultCredentials: DatabaseCredentials = {
  * });
  * ```
  */
-export async function create({ config, credentials }: { config: CreateConfig; credentials?: Partial<DatabaseCredentials> }) {
-  const client = new Client({ ...defaultCredentials, ...credentials })
+export async function create(
+  { config, credentials }: { config: CreateConfig; credentials?: Partial<DatabaseCredentials> },
+) {
+  const client = new Client( { ...defaultCredentials, ...credentials } )
 
   try {
     await client.connect()
 
-    const result = await client.query(`
+    const result = await client.query( `
       select
         datname
       from
         pg_catalog.pg_database
       where
         lower(datname) = lower('${config.database}');
-    `)
+    ` )
 
-    const tableExists = Boolean(result?.rowCount)
+    const tableExists = Boolean( result?.rowCount )
 
-    if (tableExists && config.existsError) {
+    if ( tableExists && config.existsError ) {
       throw PgToolsError.dbExists()
     }
 
-    if (tableExists && !config.existsError) {
+    if ( tableExists && !config.existsError ) {
       return
     }
 
-    await client.query(`create database "${config.database}";`)
-  } catch (error) {
-    if (error instanceof PgToolsError) {
-      throw PgToolsError.fromPgToolsError(error)
+    await client.query( `create database "${config.database}";` )
+  } catch ( error ) {
+    if ( error instanceof PgToolsError ) {
+      throw PgToolsError.fromPgToolsError( error )
     }
 
-    if (error instanceof Error) {
+    if ( error instanceof Error ) {
       throw error
     }
 
-    throw new Error(`unknown error: ${JSON.stringify(error, null, 2)}`)
+    throw new Error( `unknown error: ${JSON.stringify( error, null, 2 )}` )
   } finally {
     await client.end()
   }
@@ -143,46 +154,48 @@ export async function create({ config, credentials }: { config: CreateConfig; cr
  * });
  * ```
  */
-export async function drop({ config, credentials }: { config: DropConfig; credentials?: Partial<DatabaseCredentials> }) {
-  const client = new Client({ ...defaultCredentials, ...credentials })
+export async function drop(
+  { config, credentials }: { config: DropConfig; credentials?: Partial<DatabaseCredentials> },
+) {
+  const client = new Client( { ...defaultCredentials, ...credentials } )
 
   try {
     await client.connect()
 
-    const result = await client.query(`
+    const result = await client.query( `
       select
         datname
       from
         pg_catalog.pg_database
       where
         lower(datname) = lower('${config.database}');
-    `)
+    ` )
 
     const tableDoesntExists = result.rowCount === 0
 
-    if (tableDoesntExists && config.notExistsError) {
+    if ( tableDoesntExists && config.notExistsError ) {
       throw PgToolsError.dbExists()
     }
 
-    if (tableDoesntExists && !config.notExistsError) {
+    if ( tableDoesntExists && !config.notExistsError ) {
       return
     }
 
-    if (config.dropConnections === true) {
-      await dropConnections(client, config.database)
+    if ( config.dropConnections === true ) {
+      await dropConnections( client, config.database )
     }
 
-    await client.query(`drop database "${config.database}";`)
-  } catch (error) {
-    if (error instanceof PgToolsError) {
-      throw PgToolsError.fromPgToolsError(error)
+    await client.query( `drop database "${config.database}";` )
+  } catch ( error ) {
+    if ( error instanceof PgToolsError ) {
+      throw PgToolsError.fromPgToolsError( error )
     }
 
-    if (error instanceof Error) {
+    if ( error instanceof Error ) {
       throw error
     }
 
-    throw new Error(`unknown error: ${JSON.stringify(error, null, 2)}`)
+    throw new Error( `unknown error: ${JSON.stringify( error, null, 2 )}` )
   } finally {
     await client.end()
   }
@@ -213,8 +226,8 @@ export async function drop({ config, credentials }: { config: DropConfig; creden
  * await client.end();
  * ```
  */
-async function dropConnections(client: Client, database: string, schema = "public") {
-  return client.query(`
+function dropConnections( client: Client, database: string, schema = "public" ) {
+  return client.query( `
     revoke connect on database "${database}" from "${schema}";
 
     select
@@ -224,40 +237,41 @@ async function dropConnections(client: Client, database: string, schema = "publi
     where
       pg_stat_activity.datname = '${database}'
       and pid <> pg_backend_pid();
-  `)
+  ` )
 }
 
-export function merge<T extends object, U extends object>(target: T, source: U): T & U {
-  const result = Object.assign({}, target)
+export function merge<T extends object, U extends object>( target: T, source: U ): T & U {
+  const result = Object.assign( {}, target )
 
-  if (!source || typeof source !== "object") {
-    throw new Error("Source must be a valid object")
+  if ( !source || typeof source !== "object" ) {
+    throw new Error( "Source must be a valid object" )
   }
 
   const valid: Record<string, unknown> = {}
 
-  for (const [key, value] of Object.entries(source)) {
-    if (value === undefined) {
+  for ( const [ key, value ] of Object.entries( source ) ) {
+    if ( value === undefined ) {
       continue
     }
 
-    Object.assign(valid, { [key]: value })
+    Object.assign( valid, { [key]: value } )
   }
 
-  Object.assign(result, valid)
+  Object.assign( result, valid )
 
+  // deno-lint-ignore no-explicit-any
   return result as any
 }
 
-export function parsePostgresUrl(url: string) {
-  const urlQuery = URL.parse(url)
-  if (!urlQuery) {
-    throw new Error("Url can not be parsed")
+export function parsePostgresUrl( url: string ) {
+  const urlQuery = URL.parse( url )
+  if ( !urlQuery ) {
+    throw new Error( "Url can not be parsed" )
   }
 
-  const params = urlQuery.pathname.split("/")
-  if (params.length > 2) {
-    throw new Error("Invalid database url string was provided")
+  const params = urlQuery.pathname.split( "/" )
+  if ( params.length > 2 ) {
+    throw new Error( "Invalid database url string was provided" )
   }
 
   return {

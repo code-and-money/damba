@@ -1,21 +1,22 @@
-@alexvyber/pg-tools
-=================
+# @alexvyber/pg-tools
 
 A new CLI generated with oclif
-
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/@alexvyber/pg-tools.svg)](https://npmjs.org/package/@alexvyber/pg-tools)
 [![Downloads/week](https://img.shields.io/npm/dw/@alexvyber/pg-tools.svg)](https://npmjs.org/package/@alexvyber/pg-tools)
 
-
 <!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [Usage](#usage)
+- [Commands](#commands)
+
 <!-- tocstop -->
 
 # Usage
+
 <!-- usage -->
+
 ```sh-session
 $ npm install -g @alexvyber/pg-tools
 $ pg-tools COMMAND
@@ -27,11 +28,15 @@ USAGE
   $ pg-tools COMMAND
 ...
 ```
+
 <!-- usagestop -->
+
 # Commands
+
 <!-- commands -->
-* [`pg-tools create`](#pg-tools-create)
-* [`pg-tools drop`](#pg-tools-drop)
+
+- [`pg-tools create`](#pg-tools-create)
+- [`pg-tools drop`](#pg-tools-drop)
 
 ## `pg-tools create`
 
@@ -107,4 +112,5 @@ EXAMPLES
 ```
 
 _See code: [src/commands/drop.ts](https://github.com/alexvyber/pg-tools/blob/v0.0.0-dev.11/src/commands/drop.ts)_
+
 <!-- commandsstop -->

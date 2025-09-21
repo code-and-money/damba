@@ -1,28 +1,27 @@
 {
-  "name": "@alexvyber/pg-tools",
-  "version": "0.0.0-dev.11",
+  "name": "@codeandmoney/damba",
+  "version": "0.0.1",
   "description": "Utils to work with PostgresQL from Deno, Node and Bun",
-  "keywords": [
-    "oclif",
-    "postgres"
-  ],
+  "keywords": ["oclif", "postgres"],
   "homepage": "https://github.com/alexvyber/pg-tools",
   "bugs": "https://github.com/alexvyber/pg-tools/issues",
+  "fmt": {
+    "semiColons": false,
+    "trailingCommas": "onlyMultiLine",
+    "quoteProps": "asNeeded",
+    "indentWidth": 2,
+    "lineWidth": 120,
+    "spaceAround": true
+  },
   "repository": "alexvyber/pg-tools",
   "license": "MIT",
   "author": "Alexey Sokolov",
-  "contributors": [
-    {
-      "name": "Alexey Sokolov",
-      "email": "alexey@codeandmoney.com",
-      "url": "https://codeandmoney.com"
-    }
-  ],
+  "contributors": [{ "name": "Alexey Sokolov", "email": "alexey@codeandmoney.com", "url": "https://codeandmoney.com" }],
   "type": "module",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./mod.ts"
   },
-  "main": "dist/index.js",
+  "main": "./mod.ts",
   "types": "dist/index.d.ts",
   "bin": {
     "pg-tools": "./bin/run.js"
@@ -46,28 +45,18 @@
     "commands": "./dist/commands",
     "dirname": "pg-tools",
     "topicSeparator": " ",
-    "topics": {
-      "hello": {
-        "description": "Say hello to the world and others"
-      }
-    }
+    "topics": { "hello": { "description": "Say hello to the world and others" } }
   },
-  "dependencies": {
-    "@oclif/core": "^4.5.2",
-    "pg": "^8.16.3"
-  },
-  "devDependencies": {
-    "@types/node": "^24.3.1",
-    "@types/pg": "^8.15.5",
-    "oclif": "^4.22.16",
-    "shx": "^0.4.0",
-    "typescript": "^5.9.2"
-  },
-  "packageManager": "pnpm@10.16.0+sha512.8066e7b034217b700a9a4dbb3a005061d641ba130a89915213a10b3ca4919c19c037bec8066afdc559b89635fdb806b16ea673f2468fbb28aabfa13c53e3f769",
   "engines": {
     "node": ">=22.0.0"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "imports": {
+    "@oclif/core": "npm:@oclif/core@^4.5.4",
+    "oclif": "npm:oclif@^4.22.24",
+    "pg": "npm:pg@^8.16.3",
+    "shx": "npm:shx@^0.4.0"
   }
 }
