@@ -1,16 +1,12 @@
-import { Client } from "pg"
-import type { CreateConfig, DatabaseCredentials, DropConfig } from "./types.ts"
+import { Client } from "pg";
+import type { CreateConfig, DatabaseCredentials, DropConfig } from "./types.ts";
 
-const dambaErrors: Record<string, { name: string; code: string; message: string }> = {
-  // deno-fmt-ignore
+const dambaErrors = {
   "42P04": { name: "PDG_ERR::DuplicateDatabase", code: "42P04", message: "Database already exist." },
-  // deno-fmt-ignore
   "3D000": { name: "PDG_ERR::InvalidCatalogName", code: "3D000", message: "Database does not exist." },
-  // deno-fmt-ignore
   "23505": { name: "PDG_ERR::UniqueViolation", code: "23505", message: "Attempt to create multiple databases concurrently." },
-  // deno-fmt-ignore
   "55006": { name: "PDG_ERR::DropDatabaseInUse", code: "55006", message: "Cannot delete a database that is being accessed by other users." },
-}
+} satisfies Record<string, { name: string; code: string; message: string }>;
 
 export class DambaError extends Error {
   constructor(
@@ -19,36 +15,26 @@ export class DambaError extends Error {
     override readonly message: string,
     override readonly stack?: string,
   ) {
-    super()
+    super();
   }
 
-  public static fromDambaError( dambaError: Error & { code?: string } ): DambaError {
+  public static fromDambaError(dambaError: Error & { code?: string }): DambaError {
     return new DambaError(
       dambaError.code ? dambaErrors[dambaError.code]?.name : "PDG_ERR::UnexpectedError",
       dambaError.code ? dambaErrors[dambaError.code]?.message : dambaError.message,
       dambaError.code || "unknown",
       dambaError.stack,
-    )
+    );
   }
 
   public static dbExists(): DambaError {
-    const code = "42P04"
-    return new DambaError(
-      dambaErrors[code]?.name,
-      dambaErrors[code]?.message,
-      code,
-      Error().stack,
-    )
+    const code = "42P04";
+    return new DambaError(dambaErrors[code]?.name, dambaErrors[code]?.message, code, Error().stack);
   }
 
   public static dbDoesNotExist(): DambaError {
-    const code = "3D000"
-    return new DambaError(
-      dambaErrors[code]?.name,
-      dambaErrors[code]?.message,
-      code,
-      Error().stack,
-    )
+    const code = "3D000";
+    return new DambaError(dambaErrors[code]?.name, dambaErrors[code]?.message, code, Error().stack);
   }
 }
 
@@ -58,7 +44,7 @@ const defaultCredentials: DatabaseCredentials = {
   password: "postgres",
   port: 5432,
   host: "localhost",
-}
+};
 
 /**
  * Creates a new PostgreSQL database using the given configuration and credentials.
@@ -83,46 +69,44 @@ const defaultCredentials: DatabaseCredentials = {
  * });
  * ```
  */
-export async function create(
-  { config, credentials }: { config: CreateConfig; credentials?: Partial<DatabaseCredentials> },
-) {
-  const client = new Client( { ...defaultCredentials, ...credentials } )
+export async function create({ config, credentials }: { config: CreateConfig; credentials?: Partial<DatabaseCredentials> }) {
+  const client = new Client({ ...defaultCredentials, ...credentials });
 
   try {
-    await client.connect()
+    await client.connect();
 
-    const result = await client.query( `
+    const result = await client.query(`
       select
         datname
       from
         pg_catalog.pg_database
       where
         lower(datname) = lower('${config.database}');
-    ` )
+    `);
 
-    const tableExists = Boolean( result?.rowCount )
+    const tableExists = Boolean(result?.rowCount);
 
-    if ( tableExists && config.existsError ) {
-      throw DambaError.dbExists()
+    if (tableExists && config.existsError) {
+      throw DambaError.dbExists();
     }
 
-    if ( tableExists && !config.existsError ) {
-      return
+    if (tableExists && !config.existsError) {
+      return;
     }
 
-    await client.query( `create database "${config.database}";` )
-  } catch ( error ) {
-    if ( error instanceof DambaError ) {
-      throw DambaError.fromDambaError( error )
+    await client.query(`create database "${config.database}";`);
+  } catch (error) {
+    if (error instanceof DambaError) {
+      throw DambaError.fromDambaError(error);
     }
 
-    if ( error instanceof Error ) {
-      throw error
+    if (error instanceof Error) {
+      throw error;
     }
 
-    throw new Error( `unknown error: ${JSON.stringify( error, null, 2 )}` )
+    throw new Error(`unknown error: ${JSON.stringify(error, null, 2)}`);
   } finally {
-    await client.end()
+    await client.end();
   }
 }
 
@@ -161,50 +145,48 @@ export async function create(
  * });
  * ```
  */
-export async function drop(
-  { config, credentials }: { config: DropConfig; credentials?: Partial<DatabaseCredentials> },
-) {
-  const client = new Client( { ...defaultCredentials, ...credentials } )
+export async function drop({ config, credentials }: { config: DropConfig; credentials?: Partial<DatabaseCredentials> }) {
+  const client = new Client({ ...defaultCredentials, ...credentials });
 
   try {
-    await client.connect()
+    await client.connect();
 
-    const result = await client.query( `
+    const result = await client.query(`
       select
         datname
       from
         pg_catalog.pg_database
       where
         lower(datname) = lower('${config.database}');
-    ` )
+    `);
 
-    const tableDoesntExists = result.rowCount === 0
+    const tableDoesntExists = result.rowCount === 0;
 
-    if ( tableDoesntExists && config.notExistsError ) {
-      throw DambaError.dbExists()
+    if (tableDoesntExists && config.notExistsError) {
+      throw DambaError.dbExists();
     }
 
-    if ( tableDoesntExists && !config.notExistsError ) {
-      return
+    if (tableDoesntExists && !config.notExistsError) {
+      return;
     }
 
-    if ( config.dropConnections === true ) {
-      await dropConnections( client, config.database )
+    if (config.dropConnections === true) {
+      await dropConnections(client, config.database);
     }
 
-    await client.query( `drop database "${config.database}";` )
-  } catch ( error ) {
-    if ( error instanceof DambaError ) {
-      throw DambaError.fromDambaError( error )
+    await client.query(`drop database "${config.database}";`);
+  } catch (error) {
+    if (error instanceof DambaError) {
+      throw DambaError.fromDambaError(error);
     }
 
-    if ( error instanceof Error ) {
-      throw error
+    if (error instanceof Error) {
+      throw error;
     }
 
-    throw new Error( `unknown error: ${JSON.stringify( error, null, 2 )}` )
+    throw new Error(`unknown error: ${JSON.stringify(error, null, 2)}`);
   } finally {
-    await client.end()
+    await client.end();
   }
 }
 
@@ -233,8 +215,8 @@ export async function drop(
  * await client.end();
  * ```
  */
-function dropConnections( client: Client, database: string, schema = "public" ) {
-  return client.query( `
+function dropConnections(client: Client, database: string, schema = "public") {
+  return client.query(`
     revoke connect on database "${database}" from "${schema}";
 
     select
@@ -244,50 +226,49 @@ function dropConnections( client: Client, database: string, schema = "public" ) 
     where
       pg_stat_activity.datname = '${database}'
       and pid <> pg_backend_pid();
-  ` )
+  `);
 }
 
-export function merge<T extends object, U extends object>( target: T, source: U ): T & U {
-  const result = Object.assign( {}, target )
+export function merge<T extends object, U extends object>(target: T, source: U): T & U {
+  const result = Object.assign({}, target);
 
-  if ( !source || typeof source !== "object" ) {
-    throw new Error( "Source must be a valid object" )
+  if (!source || typeof source !== "object") {
+    throw new Error("Source must be a valid object");
   }
 
-  const valid: Record<string, unknown> = {}
+  const valid: Record<string, unknown> = {};
 
-  for ( const [ key, value ] of Object.entries( source ) ) {
-    if ( value === undefined ) {
-      continue
+  for (const [key, value] of Object.entries(source)) {
+    if (value === undefined) {
+      continue;
     }
 
-    Object.assign( valid, { [key]: value } )
+    Object.assign(valid, { [key]: value });
   }
 
-  Object.assign( result, valid )
+  Object.assign(result, valid);
 
-  // deno-lint-ignore no-explicit-any
-  return result as any
+  return result as any;
 }
 
 type ParsedPostgresConfig = {
-  scheme: string
-  user: string
-  password: string
-  host: string
-  port: string
-  database: string
-}
+  scheme: string;
+  user: string;
+  password: string;
+  host: string;
+  port: string;
+  database: string;
+};
 
-export function parsePostgresUrl( str: string ): ParsedPostgresConfig {
-  const url = URL.parse( str )
-  if ( !url ) {
-    throw new Error( "Url can not be parsed" )
+export function parsePostgresUrl(str: string): ParsedPostgresConfig {
+  const url = URL.parse(str);
+  if (!url) {
+    throw new Error("Url can not be parsed");
   }
 
-  const params = url.pathname.split( "/" )
-  if ( params.length > 2 ) {
-    throw new Error( "Invalid database url string was provided" )
+  const params = url.pathname.split("/");
+  if (params.length > 2) {
+    throw new Error("Invalid database url string was provided");
   }
 
   return {
@@ -297,5 +278,5 @@ export function parsePostgresUrl( str: string ): ParsedPostgresConfig {
     host: url.hostname,
     port: url.port,
     database: params[0],
-  }
+  };
 }
