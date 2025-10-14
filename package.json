@@ -1,6 +1,6 @@
 {
   "name": "@codeandmoney/damba",
-  "version": "0.0.0-rc.0",
+  "version": "0.0.0-rc.1",
   "description": "Utils to work with PostgresQL",
   "keywords": [
     "postgres"
