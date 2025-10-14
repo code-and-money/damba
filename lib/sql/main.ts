@@ -8,8 +8,9 @@ import { colorize } from "json-colorizer";
 import { configure, getConsoleSink } from "@logtape/logtape";
 import { getLogger } from "@logtape/logtape";
 import { styleText } from "node:util";
-import Ajv from "ajv";
-import type { JSONSchema7 } from "json-schema";
+
+// import Ajv from "ajv";
+// import type { JSONSchema7 } from "json-schema";
 
 const LIB_LOGGER = "@codeandmoney/damba::sql";
 
@@ -25,13 +26,13 @@ await configure({
   ],
 });
 
-function ajvValidate(schema: unknown) {
-  try {
-    return new Ajv().validateSchema(schema as JSONSchema7, true);
-  } catch {
-    return;
-  }
-}
+// function ajvValidate(schema: unknown) {
+//   try {
+//     return new Ajv().validateSchema(schema as JSONSchema7, true);
+//   } catch {
+//     return;
+//   }
+// }
 
 export function jsonSchemaToSql(
   schema: unknown,
@@ -39,14 +40,13 @@ export function jsonSchemaToSql(
 ): { queries: { up: string[]; down: string[] }; errors: null } | { queries: null; errors: ValidationError[] } {
   const logger = getLogger(LIB_LOGGER);
 
-  const isAjvValid = ajvValidate(schema);
-  if (!isAjvValid) {
-    console.warn("ajv: Invalid JSON Schema syntax");
-    return {
-      queries: null,
-      errors: [{ path: ["#"], message: "Invalid JSON Schema syntax" }],
-    };
-  }
+  // if (!ajvValidate(schema)) {
+  //   console.warn("ajv: Invalid JSON Schema syntax");
+  //   return {
+  //     queries: null,
+  //     errors: [{ path: ["#"], message: "Invalid JSON Schema syntax" }],
+  //   };
+  // }
 
   logger.debug("Schema: {schema}.", { schema });
 
