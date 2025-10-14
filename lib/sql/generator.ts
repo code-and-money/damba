@@ -146,6 +146,6 @@ function getColumn({ visitedColumn, table }: { visitedColumn: VisitedColumn; tab
       return table.integer(visitedColumn.name);
 
     default:
-      throw new Error("Shoud never run");
+      console.warn("Shoud never run! visitedColumn:", visitedColumn);
   }
 }
