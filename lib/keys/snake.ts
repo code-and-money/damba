@@ -22,52 +22,39 @@ export function snakeKeys<T extends Record<string, unknown> | ReadonlyArray<Reco
   input: T,
   options?: TOptions,
 ): SnakeCaseKeys<T, TOptions["deep"] extends boolean ? TOptions["deep"] : true, WithDefault<TOptions["exclude"], EmptyTuple>>;
-export function snakeKeys(obj: object, options: any) {
-  if (Array.isArray(obj)) {
-    if (obj.some((item) => item.constructor !== PlainObjectConstructor)) {
-      throw new Error("obj must be array of plain objects");
-    }
 
+export function snakeKeys(thing: object, options: any) {
+  if (Array.isArray(thing) && thing.some((item) => item.constructor !== PlainObjectConstructor)) {
+    throw new Error("thing must be array of plain objects");
+  }
+
+  if (Array.isArray(thing)) {
     options = { deep: true, exclude: [], parsingOptions: {}, ...options };
-    const convertCase = options.snakeCase || ((key) => snakeCase(key, options.parsingOptions));
+    const convertCase = options.snakeCase || ((key: string) => snakeCase(key, options.parsingOptions));
 
     // Handle arrays by mapping each element
-    return obj.map((item) => {
-      return map(
-        item,
-        (key, val) => {
-          return [matches(options.exclude, key) ? key : convertCase(key), val, mapperOptions(key, val, options)];
-        },
-        options,
-      );
-    });
-  } else {
-    if (obj.constructor !== PlainObjectConstructor) {
-      throw new Error("obj must be an plain object");
-    }
+    return thing.map((item) =>
+      map(item, (key: string, value) => [matches(options.exclude, key) ? key : convertCase(key), value, mapperOptions(key, value, options)], options),
+    );
+  }
+
+  if (!Array.isArray(thing) && thing.constructor !== PlainObjectConstructor) {
+    throw new Error("thing must be an plain object");
   }
 
   options = { deep: true, exclude: [], parsingOptions: {}, ...options };
 
-  const convertCase = options.snakeCase || ((key) => snakeCase(key, options.parsingOptions));
+  const convertCase = options.snakeCase || ((key: string) => snakeCase(key, options.parsingOptions));
 
-  return map(
-    obj,
-    (key, val) => {
-      return [matches(options.exclude, key) ? key : convertCase(key), val, mapperOptions(key, val, options)];
-    },
-    options,
-  );
+  return map(thing, (key, value) => [matches(options.exclude, key) ? key : convertCase(key), value, mapperOptions(key, value, options)], options);
 }
 
 function matches(patterns, value) {
-  return patterns.some((pattern) => {
-    return typeof pattern === "string" ? pattern === value : pattern.test(value);
-  });
+  return patterns.some((pattern) => (typeof pattern === "string" ? pattern === value : pattern.test(value)));
 }
 
-function mapperOptions(key, val, options) {
-  return options.shouldRecurse ? { shouldRecurse: options.shouldRecurse(key, val) } : undefined;
+function mapperOptions(key: string, value, options) {
+  return options.shouldRecurse ? { shouldRecurse: options.shouldRecurse(key, value) } : undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
