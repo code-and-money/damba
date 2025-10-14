@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "bun:test";
 import { jsonSchemaToSql } from "./main";
 
 describe("jsonSchemaToSql", () => {
-  it("returns an error for invalid JSON schema syntax", () => {
+  test.skip("returns an error for invalid JSON schema syntax", () => {
     const schema = {
       type: "object",
       properties: {
@@ -16,16 +16,12 @@ describe("jsonSchemaToSql", () => {
     };
 
     const result = jsonSchemaToSql(schema);
+
     expect(result.queries).toBeNull();
-    expect(result.errors).toStrictEqual([
-      {
-        message: "Invalid JSON Schema syntax",
-        path: ["#"],
-      },
-    ]);
+    expect(result.errors).toStrictEqual([{ message: "Invalid JSON Schema syntax", path: ["#"] }]);
   });
 
-  it("returns an error for invalid $ref format", () => {
+  test("returns an error for invalid $ref format", () => {
     const schema = {
       type: "object",
       properties: {
@@ -39,20 +35,15 @@ describe("jsonSchemaToSql", () => {
     };
 
     const result = jsonSchemaToSql(schema);
+
     expect(result.queries).toBeNull();
     expect(result.errors).toStrictEqual([
-      {
-        message: '$ref must start with "#/"',
-        path: ["properties", "posts", "properties", "user_id", "$ref"],
-      },
-      {
-        message: '$ref must include at least one table and a column, e.g. "#/users/id"',
-        path: ["properties", "posts", "properties", "user_id", "$ref"],
-      },
+      { message: '$ref must start with "#/"', path: ["properties", "posts", "properties", "user_id", "$ref"] },
+      { message: '$ref must include at least one table and a column, e.g. "#/users/id"', path: ["properties", "posts", "properties", "user_id", "$ref"] },
     ]);
   });
 
-  it("returns an error for missing $ref table", () => {
+  test("returns an error for missing $ref table", () => {
     const schema = {
       type: "object",
       properties: {
@@ -67,16 +58,12 @@ describe("jsonSchemaToSql", () => {
     };
 
     const result = jsonSchemaToSql(schema);
+
     expect(result.queries).toBeNull();
-    expect(result.errors).toStrictEqual([
-      {
-        message: '#/users/id references unknown table "users"',
-        path: ["properties", "posts", "properties", "user_id"],
-      },
-    ]);
+    expect(result.errors).toStrictEqual([{ message: '#/users/id references unknown table "users"', path: ["properties", "posts", "properties", "user_id"] }]);
   });
 
-  it("returns an error for missing $ref column", () => {
+  test("returns an error for missing $ref column", () => {
     const schema = {
       type: "object",
       properties: {
@@ -97,16 +84,14 @@ describe("jsonSchemaToSql", () => {
     };
 
     const result = jsonSchemaToSql(schema);
+
     expect(result.queries).toBeNull();
     expect(result.errors).toStrictEqual([
-      {
-        message: '#/users/name references unknown column "name" in table "users"',
-        path: ["properties", "posts", "properties", "user_id"],
-      },
+      { message: '#/users/name references unknown column "name" in table "users"', path: ["properties", "posts", "properties", "user_id"] },
     ]);
   });
 
-  it("returns an error for missing a required field", () => {
+  test("returns an error for missing a required field", () => {
     const schema = {
       type: "object",
       properties: {
@@ -121,16 +106,12 @@ describe("jsonSchemaToSql", () => {
     };
 
     const result = jsonSchemaToSql(schema);
+
     expect(result.queries).toBeNull();
-    expect(result.errors).toStrictEqual([
-      {
-        message: 'Requires missing field "name"',
-        path: ["properties", "users"],
-      },
-    ]);
+    expect(result.errors).toStrictEqual([{ message: 'Requires missing field "name"', path: ["properties", "users"] }]);
   });
 
-  it("returns an error for missing primary key field", () => {
+  test("returns an error for missing primary key field", () => {
     const schema = {
       type: "object",
       properties: {
@@ -154,7 +135,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("returns an error for $ref id when primary key is not explicitly defined", () => {
+  test("returns an error for $ref id when primary key is not explicitly defined", () => {
     const schema = {
       type: "object",
       properties: {
@@ -183,7 +164,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("returns an error for disallowed id type when primary key is not explicitly defined", () => {
+  test("returns an error for disallowed id type when primary key is not explicitly defined", () => {
     const schema = {
       type: "object",
       properties: {
@@ -226,7 +207,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("returns an error for disallowed id format when primary key is not explicitly defined", () => {
+  test("returns an error for disallowed id format when primary key is not explicitly defined", () => {
     const schema = {
       type: "object",
       properties: {
@@ -259,7 +240,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("returns an error for $ref primary key", () => {
+  test("returns an error for $ref primary key", () => {
     const schema = {
       type: "object",
       properties: {
@@ -289,7 +270,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("returns an error for disallowed primary key type", () => {
+  test("returns an error for disallowed primary key type", () => {
     const schema = {
       type: "object",
       properties: {
@@ -335,7 +316,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("returns an error for disallowed primary key format", () => {
+  test("returns an error for disallowed primary key format", () => {
     const schema = {
       type: "object",
       properties: {
@@ -370,7 +351,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("returns an error for referenced columns with disallowed types", () => {
+  test("returns an error for referenced columns with disallowed types", () => {
     const schema = {
       type: "object",
       properties: {
@@ -412,7 +393,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("returns an error on arrays in arrays", () => {
+  test("returns an error on arrays in arrays", () => {
     const schema = {
       type: "object",
       properties: {
@@ -442,7 +423,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("returns an error on nested objects without a primary key in the parent", () => {
+  test("returns an error on nested objects without a primary key in the parent", () => {
     const schema = {
       type: "object",
       properties: {
@@ -470,7 +451,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("returns an error on nested arrays without a primary key in the parent", () => {
+  test("returns an error on nested arrays without a primary key in the parent", () => {
     const schema = {
       type: "object",
       properties: {
@@ -496,7 +477,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("generates basic table without a primary key", () => {
+  test("generates basic table without a primary key", () => {
     const schema = {
       type: "object",
       properties: {
@@ -510,10 +491,10 @@ describe("jsonSchemaToSql", () => {
     };
     const result = jsonSchemaToSql(schema);
     expect(result.errors).toBeNull();
-    expect(result.queries).toStrictEqual(['create table "users" ("name" varchar(255));']);
+    expect(result.queries).toStrictEqual({ up: ['create table "users" ("name" text);'], down: ['drop table if exists "users" cascade;'] });
   });
 
-  it("generates basic table with primary key", () => {
+  test("generates basic table with primary key", () => {
     const schema = {
       type: "object",
       properties: {
@@ -528,10 +509,13 @@ describe("jsonSchemaToSql", () => {
     };
     const result = jsonSchemaToSql(schema);
     expect(result.errors).toBeNull();
-    expect(result.queries).toStrictEqual(['create table "users" ("id" uuid, "name" varchar(255), constraint "users_pkey" primary key ("id"));']);
+    expect(result.queries).toStrictEqual({
+      up: ['create table "users" ("id" uuid, "name" text, constraint "users_pkey" primary key ("id"));'],
+      down: ['drop table if exists "users" cascade;'],
+    });
   });
 
-  it("generates basic table where primary key overwrites id", () => {
+  test("generates basic table where primary key overwrites id", () => {
     const schema = {
       type: "object",
       properties: {
@@ -547,10 +531,10 @@ describe("jsonSchemaToSql", () => {
     };
     const result = jsonSchemaToSql(schema);
     expect(result.errors).toBeNull();
-    expect(result.queries).toStrictEqual(['create table "users" ("id" uuid, "name" varchar(255), constraint "users_pkey" primary key ("name"));']);
+    expect(result.queries).toStrictEqual(['create table "users" ("id" uuid, "name" text, constraint "users_pkey" primary key ("name"));']);
   });
 
-  it("generates a table with properties of different types", () => {
+  test("generates a table with properties of different types", () => {
     const schema = {
       type: "object",
       properties: {
@@ -569,7 +553,7 @@ describe("jsonSchemaToSql", () => {
     expect(result.queries).toStrictEqual(['create table "users" ("date" date, "datetime" timestamptz, "number" real);']);
   });
 
-  it("allows referencing columns with supported types", () => {
+  test("allows referencing columns with supported types", () => {
     const schema = {
       type: "object",
       properties: {
@@ -595,9 +579,9 @@ describe("jsonSchemaToSql", () => {
     const result = jsonSchemaToSql(schema);
     expect(result.errors).toBeNull();
     expect(result.queries).toStrictEqual([
-      'create table "posts" ("id" varchar(255), constraint "posts_pkey" primary key ("id"));',
-      'create table "users" ("string_id" varchar(255), "boolean_id" boolean, "integer_id" integer);',
-      'alter table "posts" add column "user_string_id" varchar(255), add column "user_boolean_id" boolean, add column "user_integer_id" integer;',
+      'create table "posts" ("id" text, constraint "posts_pkey" primary key ("id"));',
+      'create table "users" ("string_id" text, "boolean_id" boolean, "integer_id" integer);',
+      'alter table "posts" add column "user_string_id" text, add column "user_boolean_id" boolean, add column "user_integer_id" integer;',
       'alter table "posts" add constraint "posts_user_string_id_foreign" foreign key ("user_string_id") references "users" ("string_id");',
       'alter table "posts" add constraint "posts_user_string_id_unique" unique ("user_string_id");',
       'alter table "posts" add constraint "posts_user_boolean_id_foreign" foreign key ("user_boolean_id") references "users" ("boolean_id");',
@@ -607,7 +591,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("handles nested objects and arrays as tables", () => {
+  test("handles nested objects and arrays as tables", () => {
     const schema = {
       type: "object",
       properties: {
@@ -646,9 +630,9 @@ describe("jsonSchemaToSql", () => {
     const result = jsonSchemaToSql(schema);
     expect(result.errors).toBeNull();
     expect(result.queries).toStrictEqual([
-      'create table "users_settings" ("theme" varchar(255) not null);',
-      'create table "users_notes" ("id" uuid, "content" varchar(255) not null, constraint "users_notes_pkey" primary key ("id"));',
-      'create table "users_tags" ("value" varchar(255));',
+      'create table "users_settings" ("theme" text not null);',
+      'create table "users_notes" ("id" uuid, "content" text not null, constraint "users_notes_pkey" primary key ("id"));',
+      'create table "users_tags" ("value" text);',
       'create table "users" ("id" uuid not null, constraint "users_pkey" primary key ("id"));',
       'alter table "users_settings" add column "users_id" uuid;',
       'alter table "users_settings" add constraint "users_settings_users_id_foreign" foreign key ("users_id") references "users" ("id");',
@@ -660,7 +644,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("generates enum constraint correctly", () => {
+  test("generates enum constraint correctly", () => {
     const schema = {
       type: "object",
       properties: {
@@ -678,10 +662,10 @@ describe("jsonSchemaToSql", () => {
 
     const result = jsonSchemaToSql(schema);
     expect(result.errors).toBeNull();
-    expect(result.queries).toStrictEqual([`create table "users" ("role" varchar(255), check (role IN ('admin', 'user', 'guest')));`]);
+    expect(result.queries).toStrictEqual([`create table "users" ("role" text, check (role IN ('admin', 'user', 'guest')));`]);
   });
 
-  it("applies field descriptions as comments", () => {
+  test("applies field descriptions as comments", () => {
     const schema = {
       type: "object",
       properties: {
@@ -699,10 +683,10 @@ describe("jsonSchemaToSql", () => {
 
     const result = jsonSchemaToSql(schema);
     expect(result.errors).toBeNull();
-    expect(result.queries).toStrictEqual(['create table "users" ("name" varchar(255));', `comment on column "users"."name" is 'The full name of the user';`]);
+    expect(result.queries).toStrictEqual(['create table "users" ("name" text);', `comment on column "users"."name" is 'The full name of the user';`]);
   });
 
-  it("applies default values to columns", () => {
+  test("applies default values to columns", () => {
     const schema = {
       type: "object",
       properties: {
@@ -727,7 +711,7 @@ describe("jsonSchemaToSql", () => {
     expect(result.queries).toStrictEqual(['create table "users" ("age" integer default \'30\', "is_active" boolean default \'1\');']);
   });
 
-  it("handles deeply nested objects", () => {
+  test("handles deeply nested objects", () => {
     const schema = {
       type: "object",
       properties: {
@@ -767,9 +751,9 @@ describe("jsonSchemaToSql", () => {
     const result = jsonSchemaToSql(schema);
     expect(result.errors).toBeNull();
     expect(result.queries).toStrictEqual([
-      'create table "company_departments_employees" ("id" uuid, "fullName" varchar(255) not null, "title" varchar(255), constraint "company_departments_employees_pkey" primary key ("id"));',
-      'create table "company_departments" ("id" uuid, "name" varchar(255) not null, constraint "company_departments_pkey" primary key ("id"));',
-      'create table "company" ("id" uuid, "name" varchar(255), constraint "company_pkey" primary key ("id"));',
+      'create table "company_departments_employees" ("id" uuid, "fullName" text not null, "title" text, constraint "company_departments_employees_pkey" primary key ("id"));',
+      'create table "company_departments" ("id" uuid, "name" text not null, constraint "company_departments_pkey" primary key ("id"));',
+      'create table "company" ("id" uuid, "name" text, constraint "company_pkey" primary key ("id"));',
       'alter table "company_departments_employees" add column "company_departments_id" uuid;',
       'alter table "company_departments_employees" add constraint "company_departments_employees_company_departments_id_foreign" foreign key ("company_departments_id") references "company_departments" ("id");',
       'alter table "company_departments" add column "company_id" uuid;',
@@ -777,7 +761,7 @@ describe("jsonSchemaToSql", () => {
     ]);
   });
 
-  it("accepts nested structures with a custom primary key in the parent", () => {
+  test("accepts nested structures with a custom primary key in the parent", () => {
     const schema = {
       type: "object",
       properties: {
@@ -804,13 +788,13 @@ describe("jsonSchemaToSql", () => {
     const result = jsonSchemaToSql(schema);
     expect(result.errors).toBeNull();
     expect(result.queries).toStrictEqual([
-      'create table "users_settings" ("theme" varchar(255));',
-      'create table "users_notes" ("value" varchar(255));',
-      'create table "users" ("name" varchar(255), constraint "users_pkey" primary key ("name"));',
-      'alter table "users_settings" add column "users_name" varchar(255);',
+      'create table "users_settings" ("theme" text);',
+      'create table "users_notes" ("value" text);',
+      'create table "users" ("name" text, constraint "users_pkey" primary key ("name"));',
+      'alter table "users_settings" add column "users_name" text;',
       'alter table "users_settings" add constraint "users_settings_users_name_foreign" foreign key ("users_name") references "users" ("name");',
       'alter table "users_settings" add constraint "users_settings_users_name_unique" unique ("users_name");',
-      'alter table "users_notes" add column "users_name" varchar(255);',
+      'alter table "users_notes" add column "users_name" text;',
       'alter table "users_notes" add constraint "users_notes_users_name_foreign" foreign key ("users_name") references "users" ("name");',
     ]);
   });

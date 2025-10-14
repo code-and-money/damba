@@ -45,6 +45,7 @@ const ArrayColumnSchema = v.looseObject({
 });
 
 const EnumTypeSchema = v.looseObject({
+  type: v.literal("enum"),
   enum: v.optional(v.array(PrimitiveValueSchema)),
 });
 

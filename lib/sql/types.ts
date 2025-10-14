@@ -1,4 +1,4 @@
-type VisitedColumn = {
+export type VisitedColumn = {
   name: string;
   type: "uuid" | "string" | "date" | "datetime" | "boolean" | "number" | "integer" | "date-time" | "email" | "json" | "jsonb";
   default?: string | number | boolean;
@@ -8,7 +8,7 @@ type VisitedColumn = {
   metadata?: Record<string, any>;
 };
 
-type Reference = {
+export type Reference = {
   table: string;
   column: string;
 };

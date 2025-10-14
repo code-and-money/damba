@@ -151,17 +151,3 @@ const TableSchema = z
       }
     }
   });
-
-// export const DatabaseSchema = z
-//   .object({ type: z.literal("object"), properties: z.record(z.string(), TableSchema) })
-//   .passthrough();
-
-// const ajv = new Ajv();
-
-// export function ajvValidate(schema: unknown) {
-//   try {
-//     return ajv.validateSchema(schema as JSONSchema7, true);
-//   } catch {
-//     return;
-//   }
-// }

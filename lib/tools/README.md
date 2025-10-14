@@ -12,7 +12,7 @@
 <!-- usage -->
 
 ```sh
-deno add jsr:@codeandmoney/damba
+bun add @codeandmoney/damba
 
 damba COMMAND
 # running command...

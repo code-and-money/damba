@@ -1,5 +1,5 @@
 import knex from "knex";
-import type { ResolvedTable } from "./types";
+import type { ResolvedTable, VisitedColumn } from "./types";
 
 export function generateSql(resolvedTables: ResolvedTable[], dialect: "pg" | "mysql" = "pg"): { up: string[]; down: string[] } {
   const db = knex({ client: dialect });
@@ -12,103 +12,62 @@ export function generateSql(resolvedTables: ResolvedTable[], dialect: "pg" | "my
 
     const builder = db.schema.createTable(resolvedTable.name, (table) => {
       for (const visitedColumn of resolvedTable.visitedColumns) {
-        const { type, name } = visitedColumn;
-
-        let col;
-
-        switch (type) {
-          case "uuid":
-            col = table.uuid(name);
-            break;
-
-          case "email":
-            col = table.text(name);
-            break;
-
-          case "json":
-            col = table.json(name);
-            break;
-
-          case "jsonb":
-            col = table.jsonb(name);
-            break;
-
-          case "string":
-            col = table.text(name);
-            break;
-
-          case "boolean":
-            col = table.boolean(name);
-            break;
-
-          case "date":
-            col = table.date(name);
-            break;
-
-          case "datetime":
-            col = table.datetime(name);
-            break;
-
-          case "date-time":
-            col = table.datetime(name);
-            break;
-
-          case "number":
-            col = table.float(name);
-            break;
-
-          case "integer":
-            col = table.integer(name);
-            break;
-        }
+        let column = getColumn({ visitedColumn, table });
 
         if (visitedColumn.enum) {
-          const enumName = `${resolvedTable.name}_${name}_enum`;
+          const enumName = `${resolvedTable.name}_${visitedColumn.name}_enum`;
 
-          col = table.enum(name, visitedColumn.enum, {
-            enumName,
-            useNative: true,
-          });
+          column = table.enum(visitedColumn.name, visitedColumn.enum, { enumName, useNative: true });
 
           down.push(db.raw(`drop type "${enumName}";`).toSQL().sql);
         }
 
         if (visitedColumn.metadata) {
           if (visitedColumn.metadata.index) {
-            col.index();
+            column.index();
           }
 
           if (visitedColumn.metadata.unique) {
-            col.unique();
+            column.unique();
           }
 
           if (visitedColumn.metadata.default) {
-            col.defaultTo(db.raw(visitedColumn.metadata.default));
+            column.defaultTo(db.raw(visitedColumn.metadata.default));
           }
         }
 
-        if (resolvedTable.required?.includes(name)) {
-          col.notNullable();
+        if (resolvedTable.required?.includes(visitedColumn.name) || visitedColumn.metadata?.notNull) {
+          column.notNullable();
         }
 
         if (visitedColumn.default) {
-          col.defaultTo(visitedColumn.default);
+          column.defaultTo(visitedColumn.default);
         }
 
         if (typeof visitedColumn?.metadata?.comment === "string" && visitedColumn.metadata.comment) {
-          col.comment(visitedColumn?.metadata.comment);
+          column.comment(visitedColumn?.metadata.comment);
         } else if (visitedColumn.title && visitedColumn.description) {
-          col.comment(`${visitedColumn.title}: ${visitedColumn.description}`);
+          column.comment(`${visitedColumn.title}: ${visitedColumn.description}`);
         } else if (visitedColumn.title) {
-          col.comment(visitedColumn.title);
+          column.comment(visitedColumn.title);
         } else if (visitedColumn.description) {
-          col.comment(visitedColumn.description);
+          column.comment(visitedColumn.description);
+        }
+
+        if (visitedColumn.type === "integer") {
+          if ("minimum" in visitedColumn && typeof visitedColumn.minimum === "number") {
+            table.check(` "${resolvedTable.name}"."${visitedColumn.name}" >= ${visitedColumn.minimum} `);
+          }
+
+          if ("maximum" in visitedColumn && typeof visitedColumn.maximum === "number") {
+            table.check(` "${resolvedTable.name}"."${visitedColumn.name}" <= ${visitedColumn.maximum} `);
+          }
         }
       }
 
       if (resolvedTable.primaryKey) {
         table.primary([resolvedTable.primaryKey]);
-      } else if (resolvedTable.visitedColumns.find((c) => c.name === "id")) {
+      } else if (resolvedTable.visitedColumns.find((column) => column.name === "id")) {
         table.primary(["id"]);
       }
     });
@@ -148,5 +107,45 @@ export function generateSql(resolvedTables: ResolvedTable[], dialect: "pg" | "my
     up.push(...builder.toSQL().map((q) => `${q.sql};`));
   }
 
-  return { down, up };
+  return { up, down };
+}
+
+function getColumn({ visitedColumn, table }: { visitedColumn: VisitedColumn; table: knex.Knex.CreateTableBuilder }): knex.Knex.ColumnBuilder {
+  switch (visitedColumn.type) {
+    case "uuid":
+      return table.uuid(visitedColumn.name);
+
+    case "email":
+      return table.text(visitedColumn.name);
+
+    case "json":
+      return table.json(visitedColumn.name);
+
+    case "jsonb":
+      return table.jsonb(visitedColumn.name);
+
+    case "string":
+      return table.text(visitedColumn.name);
+
+    case "boolean":
+      return table.boolean(visitedColumn.name);
+
+    case "date":
+      return table.date(visitedColumn.name);
+
+    case "datetime":
+      return table.datetime(visitedColumn.name);
+
+    case "date-time":
+      return table.datetime(visitedColumn.name);
+
+    case "number":
+      return table.float(visitedColumn.name);
+
+    case "integer":
+      return table.integer(visitedColumn.name);
+
+    default:
+      throw new Error("Shoud never run");
+  }
 }
